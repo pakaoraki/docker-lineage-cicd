@@ -13,8 +13,8 @@ However, all MicroG patches options are still available as original lineageos4mi
 
 The sources scripts have been made by following the best practices from <https://github.com/ralish/bash-script-template>.
 
-* Github sources: [pakaoraki/docker-lineage-cicd](#pakaoraki_src)
-* DockerHub image: [docker_link](#pakaoraki_image)
+* Github sources: [pakaoraki/docker-lineage-cicd][pakaoraki_src]
+* DockerHub image: [docker_link][pakaoraki_image]
 
 ## New features
 
@@ -45,18 +45,18 @@ or a manual set up of a Virtual Machine.
 
 The official Docker guides are well-written:
 
-* Linux [Ubuntu](#docker-ubuntu), [Debian](#docker-debian),
+* Linux [Ubuntu][docker-ubuntu], [Debian][docker-debian],
    [CentOS][docker-centos] and [Fedora][docker-fedora] are officially
    supported)
-* [Windows 10/Windows Server 2016 64bit](#docker-win)
-* [Mac OS El Capitan 10.11 or newer](#docker-mac)
+* [Windows 10/Windows Server 2016 64bit][docker-win]
+* [Mac OS El Capitan 10.11 or newer][docker-mac]
 
 If your Windows or Mac system doesn't satisfy the requirements (or if you have
 Oracle VirtualBox installed, you can use [Docker Toolbox][docker-toolbox].
 Docker Toolbox is not described in this guide, but it should be very similar to
 the standard Docker installation.
 
-Once you can run the [`hello-world` image](#docker-helloworld) you're ready to
+Once you can run the [`hello-world` image][docker-helloworld] you're ready to
 start!
 
 ## How can I build LineageOS?
@@ -65,28 +65,28 @@ This Docker image contains a great number of settings, to allow you to fully
 customize your LineageOS build. Here you can find all of them, with the default
 values between the brackets.
 
-TL;DR - go to the [Examples](#examples)
+TL;DR - go to the [Examples][examples]
 
 ### Fundamental settings
 
 The two fundamental settings are:
 
 * `BRANCH_NAME (lineage-17.1)`: LineageOS branch, see the branch list
-   [here](#los-branches) (multiple comma-separated branches can be specified)
+   [here][los-branches] (multiple comma-separated branches can be specified)
 * `DEVICE_LIST`: comma-separated list of devices to build
 
 Running a build with only these two set will create a ZIP file almost identical
 to the LineageOS official builds, just signed with the test keys.
 
 When multiple branches are selected, use `DEVICE_LIST_<BRANCH_NAME>` to specify
-the list of devices for each specific branch (see [the examples](#examples)).
+the list of devices for each specific branch (see [the examples][examples]).
 
 ### Signature spoofing
 
-There are two options for the [signature spoofing patch](#signature-spoofing)
-required for [microG](#microg):
+There are two options for the [signature spoofing patch][signature-spoofing]
+required for [microG][microg]:
 
-* "Original" [patches](#signature-spoofing-patches)
+* "Original" [patches][signature-spoofing-patches)
 * Restricted patches
 
 With the "original" patch the FAKE_SIGNATURE permission can be granted to any
@@ -117,10 +117,10 @@ Some proprietary files are needed to create a LineageOS build, but they're not
 included in the LineageOS repo for legal reasons. You can obtain these blobs in
 three ways:
 
-* by [pulling them from a running LineageOS](#blobs-pull)
-* by [extracting them from a LineageOS ZIP](#blobs-extract)
-* by downloading them from TheMuppets [GitHub](#blobs-themuppets) and
-  [GitLab](#blobs-the-muppets) repositories (unofficial)
+* by [pulling them from a running LineageOS][blobs-pull]
+* by [extracting them from a LineageOS ZIP][blobs-extract]
+* by downloading them from TheMuppets [GitHub][blobs-themuppets] and
+  [GitLab][blobs-the-muppets] repositories (unofficial)
 
 The third way is the easiest one and is enabled by default; if you're OK with
 that just move on, otherwise set `INCLUDE_PROPRIETARY (true)` to `false` and
@@ -182,7 +182,7 @@ There is 3 differents variants that you can chose to build an android.
 | userdebug | Like user but with root access and debug capability; preferred for debugging |
 | eng       | Development configuration with additional debugging tools                    |
 
-*More information: [source](#android_build_source)*
+*More information: [source][android_build_source]*
 
 You can specify buildtype with:
 
@@ -217,7 +217,7 @@ Other useful settings are:
 * **`TRACE_MODE (false)`**: Activate `set -o xtrace` inside scripts.
 
 The full list of settings, including the less interesting ones not mentioned in
-this guide, can be found in the [Dockerfile](#dockerfile).
+this guide, can be found in the [Dockerfile][dockerfile].
 
 ## Volumes
 
@@ -317,7 +317,7 @@ docker run \
 
 As there is no official support for this device, we first have to include the
 sources in the source tree through an XML in the `/home/user/manifests` folder;
-from [this](#a6000-xda) thread we get the links of:
+from [this][a6000-xda] thread we get the links of:
 
 * Device tree: https://github.com/dev-harsh1998/android_device_lenovo_a6000
 * Common Tree: https://github.com/dev-harsh1998/android_device_lenovo_msm8916-common
@@ -325,8 +325,8 @@ from [this](#a6000-xda) thread we get the links of:
 * Vendor blobs: https://github.com/dev-harsh1998/proprietary-vendor_lenovo
 
 Then, with the help of lineage.dependencies from the
-[device tree](#a6000-device-tree-deps) and the
-[common tree](#a6000-common-tree-deps) we create an XML
+[device tree][a6000-device-tree-deps] and the
+[common tree][a6000-common-tree-deps] we create an XML
 `/home/user/manifests/a6000.xml` with this content:
 
 ```
@@ -378,14 +378,14 @@ docker run \
 
 As there is no official support for this device, we first have to include the
 sources in the source tree through an XML in the `/home/user/manifests` folder;
-from [this](#da_starlte) and [this](#xda2_starlte) threads we get the links of:
+from [this][da_starlte] and [this]([da2_starlte] threads we get the links of:
 
-- Device tree: [GitHub - pakaoraki/android_device_samsung_starlte](https://github.com/pakaoraki/android_device_samsung_starlte)
-- Common Tree: [GitHub - pakaoraki/android_device_samsung_universal9810-common](https://github.com/pakaoraki/android_device_samsung_universal9810-common)
-- Kernel: [GitHub - pakaoraki/android_kernel_samsung_universal9810](https://github.com/pakaoraki/android_kernel_samsung_universal9810)
-- Vendor blobs: [GitHub - pakaoraki/proprietary_vendor_samsung](https://github.com/pakaoraki/proprietary_vendor_samsung)
+- Device tree: [GitHub - pakaoraki/android_device_samsung_starlte](#https://github.com/pakaoraki/android_device_samsung_starlte)
+- Common Tree: [GitHub - pakaoraki/android_device_samsung_universal9810-common](#https://github.com/pakaoraki/android_device_samsung_universal9810-common)
+- Kernel: [GitHub - pakaoraki/android_kernel_samsung_universal9810](#https://github.com/pakaoraki/android_kernel_samsung_universal9810)
+- Vendor blobs: [GitHub - pakaoraki/proprietary_vendor_samsung](#https://github.com/pakaoraki/proprietary_vendor_samsung)
 
-Then, with the help of lineage.dependencies we create an XML (available [here](#pakaoraki_local_manifest)) `/home/user/manifests/local_manifest.xml` with this content:
+Then, with the help of lineage.dependencies we create an XML (available [here][pakaoraki_local_manifest]) `/home/user/manifests/local_manifest.xml` with this content:
 
 ```
 <?xml version="1.0" encoding="UTF-8"?>
