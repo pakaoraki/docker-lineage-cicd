@@ -21,7 +21,7 @@ The sources scripts have been made by following the best practices from <https:/
 List of changes made:
 
 1. Add new options for building:
-   * __`BUILD_VARIANT`__ : allow to choose buildtype (userdebug, release...).
+   * __`BUILD_VARIANT`__ : allow to choose buildtype (userdebug, user,eng).
    * __`SILENT`__, __`SILENT_BUILD`__, __`SILENT_REPO`__: mute print on terminal.
    * __`DEBUG_MODE`__, __`TRACE_MODE`__: debug options.
    * __`TEST_SCRIPT`__: ability to exec custom script without building for testing purpose.
