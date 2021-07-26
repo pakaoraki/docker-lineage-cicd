@@ -6,7 +6,7 @@ Docker microservice for LineageOS Continuous Integration and Continuous Deployme
 
 This version is not the original made by lineageos4microg.
 
-The __`pakaoraki/docker-lineage-cicd`__ is a partly re-write docker image of the original [lineageos4microg/docker-lineage-cicd][lineageos4microg_docker], base on [this sources][lineageos4microg_src].
+The __`pakaoraki/docker-lineage-cicd`__ is a partly re-writed docker image of the original [lineageos4microg/docker-lineage-cicd][lineageos4microg_docker], base on [this sources][lineageos4microg_src].
 
 The original docker image was targeting MicroG spoofing modification for Lineageos. This re-writed version is focus for a pure vanilla Lineageos build. 
 However, all MicroG patches options are still available as original lineageos4microg.
@@ -14,7 +14,7 @@ However, all MicroG patches options are still available as original lineageos4mi
 The sources scripts have been made by following the best practices from <https://github.com/ralish/bash-script-template>.
 
 * Github sources: [pakaoraki/docker-lineage-cicd][pakaoraki_src]
-* DockerHub image: [docker_link][pakaoraki_image]
+* DockerHub image: [docker image][pakaoraki_image]
 
 ## New features
 
@@ -164,8 +164,8 @@ You can use custom scripts that can be executed at different specific time durin
    * __`test.sh`__: for testing purpose (see below).
    * __`begin.sh`__: execute before repo sync and building.
    * __`before.sh`__: execute after repo sync and before building.
-   * __`pre-build`__: execute just before each building images.
-   * __`post-build`__: execute just after each building is done.
+   * __`pre-build`__: execute just before each build.
+   * __`post-build`__: execute just after each build.
    * __`end.sh`__: execute at the end of the process.
 
 Dev option:
@@ -422,6 +422,7 @@ docker run \
 
 [lineageos4microg_src]: https://github.com/lineageos4microg/docker-lineage-cicd (lineageos4microg Github sources)
 [lineageos4microg_docker]: https://hub.docker.com/r/lineageos4microg/docker-lineage-cicd/Dockerfile (lineageos4microg Docker image)
+[pakaoraki_image]: https://hub.docker.com/r/pakaoraki/docker-lineage-cicd (Docker image)
 [pakaoraki_src]: https://github.com/pakaoraki/docker-lineage-cicd (pakaoraki Github sources)
 [pakaoraki_local_manifest]: https://github.com/pakaoraki/local_manifests (pakaoraki Github manifest)
 [android_build_source]: https://developer.android.com/reference/tools/gradle-api/4.1/com/android/build/api/variant/Variant
