@@ -6,7 +6,7 @@ Docker microservice for LineageOS Continuous Integration and Continuous Deployme
 
 This version is not the original made by lineageos4microg.
 
-The __`pakaoraki/docker-lineage-cicd`__ is a partly re-write docker image of the original [lineageos4microg/docker-lineage-cicd](#lineageos4microg_docker), base on [this sources](#lineageos4microg_src).
+The __`pakaoraki/docker-lineage-cicd`__ is a partly re-write docker image of the original [lineageos4microg/docker-lineage-cicd][lineageos4microg_docker], base on [this sources][lineageos4microg_src].
 
 The original docker image was targeting MicroG spoofing modification for Lineageos. This re-writed version is focus for a pure vanilla Lineageos build. 
 However, all MicroG patches options are still available as original lineageos4microg.
@@ -423,13 +423,10 @@ docker run \
 [lineageos4microg_src]: https://github.com/lineageos4microg/docker-lineage-cicd (lineageos4microg Github sources)
 [lineageos4microg_docker]: https://hub.docker.com/r/lineageos4microg/docker-lineage-cicd/Dockerfile (lineageos4microg Docker image)
 [pakaoraki_src]: https://github.com/pakaoraki/docker-lineage-cicd (pakaoraki Github sources)
-
 [pakaoraki_local_manifest]: https://github.com/pakaoraki/local_manifests (pakaoraki Github manifest)
-[android_build_source]: https://developer.android.com/reference/tools/gradle-api/4.1/com/android/build/api/variant/Variant 
-
+[android_build_source]: https://developer.android.com/reference/tools/gradle-api/4.1/com/android/build/api/variant/Variant
 [xda_starlte]: https://forum.xda-developers.com/t/rom-s9-s9-unofficial-lineageos-18-1-21-03-2021.4203777/ (XDA Forum S9/S9+ Lineage 18.1)
 [xda2_starlte]: https://forum.xda-developers.com/t/rom-s9-s9-unofficial-lineageos-18-1-weekly.4302901/ (XDA Forum S9/S9+ - weekly - Lineage 18.1)
-
 [docker-ubuntu]: https://docs.docker.com/install/linux/docker-ce/ubuntu/
 [docker-debian]: https://docs.docker.com/install/linux/docker-ce/debian/
 [docker-centos]: https://docs.docker.com/install/linux/docker-ce/centos/
