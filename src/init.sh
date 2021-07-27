@@ -98,6 +98,9 @@
 # Common
 #----------------------------
     PRINT_TERMINAL=true
+    SILENT_REPO=""
+    SILENT_BUILD=""
+    SHOW_ERRORS_ONLY=""
     
 ###############################################################################
 #     FUNCTIONS
@@ -189,9 +192,7 @@ function main() {
     print_log " -\$DEBUG_MODE: $DEBUG_MODE "                     "DEBUG"
     print_log " -\$TRACE_MODE: $TRACE_MODE "                     "DEBUG"
     print_log " -\$TEST_SCRIPT: $TEST_SCRIPT "                   "DEBUG"
-    print_log " -\$SILENT: $SILENT "                             "DEBUG"
-    print_log " -\$SILENT_REPO: $SILENT_REPO "                   "DEBUG"
-    print_log " -\$SILENT_BUILD: $SILENT_BUILD "                 "DEBUG"   
+    print_log " -\$PRINT_MODE: $PRINT_MODE "                     "DEBUG"
     print_log " -\$MIRROR_DIR: $MIRROR_DIR "                     "DEBUG"
     print_log " -\$SRC_DIR: $SRC_DIR "                           "DEBUG"
     print_log " -\$TMP_DIR: $TMP_DIR "                           "DEBUG"
@@ -255,9 +256,9 @@ function main() {
         && script_exit "wrong options" 9
         
     # PRINT_MODE
-    pattern_options='all|silent|no_repo|no_build|no_repo_build|build_erros'
-    if [[ "$PRINT_MODE" =~ ^($pattern_options)$ ]]; then
-        print_log "Wrong options for \$PRINT_MODE: $BUILD_VARIANT" "ERROR" \
+    pattern_options='all|silent|no_repo|no_build|no_repo_build|build_errors'
+    if [[ ! "$PRINT_MODE" =~ ^($pattern_options)$ ]]; then
+        print_log "Wrong options for \$PRINT_MODE: $PRINT_MODE" "ERROR" \
         script_exit "wrong options" 9
     fi
     [[ "$PRINT_MODE" = "silent" ]] && PRINT_TERMINAL=false

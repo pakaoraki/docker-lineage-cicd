@@ -602,7 +602,7 @@ function main() {
             SILENT_REPO=true
             SILENT_BUILD=true
             ;;
-        buid_errors)
+        build_errors)
             SHOW_ERRORS_ONLY=true
             ;;
         *)

@@ -574,9 +574,9 @@ function print_log_catcher() {
     fi
     
     # Disbale print on screen if set
-    [[ $category = "REPO" ]] && [[ $PRINT_MODE = true ]] 
+    [[ $category = "REPO" ]] && [[ $SILENT_REPO = true ]] \
         && PRINT_TERMINAL=false
-    [[ $category = "BUIL" ]] && [[ $SILENT_BUILD = true ]] 
+    [[ $category = "BUILD" ]] && [[ $SILENT_BUILD = true ]] \
         && PRINT_TERMINAL=false
             
     # Get input lines
@@ -613,15 +613,20 @@ function print_log_catcher() {
         fi
         
         # Check print mode 
-        if [[ $SHOW_ERRORS_ONLY = true  ]]; then
-        
-            # Print onlu
-            [[ $type_of_log_line = "ERROR" ]] \
-                || [[ $type_of_log_line = "WARN" ]] \
-                && PRINT_TERMINAL=false
+        if [[ $category = "BUILD" ]] && [[ "$SHOW_ERRORS_ONLY" = true ]]; then
+ 
+            PRINT_TERMINAL=false
+            
+            # Print only
+            [[ "$type_of_log_line" = "ERROR" ]] \
+                || [[ "$type_of_log_line" = "WARN" ]] \
+                && PRINT_TERMINAL=true 
+                
             # Print logs
             print_log "$line" "$type_of_log_line" $log_file
+            
             PRINT_TERMINAL=true
+            
         else
             # Print logs
             print_log "$line" "$type_of_log_line" $log_file 
