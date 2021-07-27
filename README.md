@@ -188,6 +188,19 @@ You can specify buildtype with:
 
 * **`BUILD_VARIANT (userdebug)`** : set to `eng`, `user` or `userdebug`(default).
 
+### Print output
+
+You can change the print output behavior.
+
+* **`PRINT_MODE (all)`** : 
+	* set to `silent`: no output at all.
+	* set to `no_repo`: no related "repo" command print output.
+	* set to `no_build`: no build lineage output.
+	* set to `no_repo_no_build`: same as `no_repo` and `no_build`.
+	* set to `build_errors`: show only errors and warning during the build process.
+
+Note: This doesn't affect any logs.
+
 ### Other settings
 
 Other useful settings are:
@@ -207,9 +220,6 @@ Other useful settings are:
 * **`CRONTAB_TIME (now)`:** instead of building immediately and exit, build at the
    specified time (uses standard cron format)
 * **`ZIP_SUBDIR (true)`**: Move the resulting zips to $ZIP_DIR/$codename instead of $ZIP_DIR/
-* __`SILENT (false)`__: Don not print anything on terminal (does not affect logs). 
-* **`SILENT_REPO_ (false)`**: Do not print any `repo` related operations on terminal (does not affect logs).
-* **`SILENT_BUILD (false)`**: Do not print any buildind informations on terminal (does not affect logs).
 
   For dev pupose only:
 
