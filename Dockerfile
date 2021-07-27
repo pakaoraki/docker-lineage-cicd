@@ -38,17 +38,9 @@ ENV TEST_SCRIPT false
 
 # *******************
 
-# Don't print anything on screen *
-ENV SILENT false
-
-# Don't print repo log on screen *
-ENV SILENT_REPO false
-
-# Don't print any log on screen only for buildind process *
-ENV SILENT_BUILD false
-
-# * (affect only the terminal screen, logs file will still be used)
-
+# Select what to print on the screen (does not apply to logs)
+# all|silent|no_repo|no_build|no_repo_build|build_errors
+ENV PRINT_MODE 'all'
 
 # By default we want to use CCACHE, you can disable this
 # WARNING: disabling this may slow down a lot your builds!

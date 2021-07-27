@@ -147,6 +147,9 @@
     EXIT_CODE=""
     BUILDS_FAILED=false
     PRINT_TERMINAL=true
+    SILENT_REPO=""
+    SILENT_BUILD=""
+    SHOW_ERRORS_ONLY=""
     
 # stats
 #----------------------------    
@@ -581,8 +584,31 @@ function main() {
     colour_init
     #lock_init system
 
-    # Disable log on screen if set
-    [[ SILENT = true ]] && PRINT_TERMINAL=false
+    # Set PRINT_MODE    
+    case $PRINT_MODE in 
+        all)
+            PRINT_TERMINAL=true
+            ;;
+        silent)
+            PRINT_TERMINAL=false
+            ;;
+        no_repo)
+            SILENT_REPO=true
+            ;;
+        no_build)
+            SILENT_BUILD=true
+            ;;
+        no_repo_build)
+            SILENT_REPO=true
+            SILENT_BUILD=true
+            ;;
+        build_errors)
+            SHOW_ERRORS_ONLY=true
+            ;;
+        *)
+            script_exit "Invalid parameter \$PRINT_MODE: $PRINT_MODE" 1
+            ;;
+    esac
     
     # cd to working directory
     cd "$SRC_DIR" || script_exit 0
