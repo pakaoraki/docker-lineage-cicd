@@ -574,11 +574,11 @@ function print_log_catcher() {
     fi
     
     # Disbale print on screen if set
-    [[ $category = "REPO" ]] && [[ $SILENT_REPO = true ]] 
+    [[ $category = "REPO" ]] && [[ $PRINT_MODE = true ]] 
         && PRINT_TERMINAL=false
     [[ $category = "BUIL" ]] && [[ $SILENT_BUILD = true ]] 
         && PRINT_TERMINAL=false
-    
+            
     # Get input lines
     while IFS= read -r line; do
         
@@ -611,8 +611,22 @@ function print_log_catcher() {
             [[ $line == *"warning"* ]] \
                 && type_of_log_line="WARN"
         fi
-        # Print logs
-        print_log "$line" "$type_of_log_line" $log_file       
+        
+        # Check print mode 
+        if [[ $SHOW_ERRORS_ONLY = true  ]]; then
+        
+            # Print onlu
+            [[ $type_of_log_line = "ERROR" ]] \
+                || [[ $type_of_log_line = "WARN" ]] \
+                && PRINT_TERMINAL=false
+            # Print logs
+            print_log "$line" "$type_of_log_line" $log_file
+            PRINT_TERMINAL=true
+        else
+            # Print logs
+            print_log "$line" "$type_of_log_line" $log_file 
+        fi
+              
         #print_log "|$line|" "DEBUG" $log_file        
     done
     

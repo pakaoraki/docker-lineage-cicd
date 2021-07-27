@@ -245,12 +245,23 @@ function main() {
     print_log " -\$GEN_KEY_SCRIPT: $GEN_KEY_SCRIPT "             "DEBUG"  
     print_log " -\$PATH_USERSCRIPTS: $PATH_USERSCRIPTS "         "DEBUG"  
     print_log " -\$DOCKER_LOG: $DOCKER_LOG "                     "DEBUG"
-
+ 
     # Check Env Variables
+    #----------------------------
+    
+    # VARIANT
     [[ ! "$BUILD_VARIANT" =~ ^(user|userdebug|eng)$ ]] \
         && print_log "Wrong options for \$BUILD_VARIANT: $BUILD_VARIANT" "ERROR" \
         && script_exit "wrong options" 9
-    
+        
+    # PRINT_MODE
+    pattern_options='all|silent|no_repo|no_build|no_repo_build|build_erros'
+    if [[ "$PRINT_MODE" =~ ^($pattern_options)$ ]]; then
+        print_log "Wrong options for \$PRINT_MODE: $BUILD_VARIANT" "ERROR" \
+        script_exit "wrong options" 9
+    fi
+    [[ "$PRINT_MODE" = "silent" ]] && PRINT_TERMINAL=false
+        
     # Copy the user scripts
     mkdir -p $PATH_USERSCRIPTS
     cp -r "$USERSCRIPTS_DIR"/. $PATH_USERSCRIPTS
