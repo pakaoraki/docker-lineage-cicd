@@ -22,7 +22,7 @@ List of changes made:
 
 1. Add new options for building:
    * __`BUILD_VARIANT`__ : allow to choose buildtype (userdebug, user,eng).
-   * __`SILENT`__, __`SILENT_BUILD`__, __`SILENT_REPO`__: mute print on terminal.
+   * __`PRINT_MODE`__: change output behavior (silent mode, hide build output...).
    * __`DEBUG_MODE`__, __`TRACE_MODE`__: debug options.
    * __`TEST_SCRIPT`__: ability to exec custom script without building for testing purpose.
 2. Improve logs and screen visibility (add color, detect warning and errors, add new TIMESTAMP).
