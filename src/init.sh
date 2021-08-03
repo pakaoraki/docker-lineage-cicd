@@ -183,7 +183,7 @@ function main() {
     #lock_init system
 
 
-    # Init build
+    # Debug
     #---------------------------- 
 
     # Display debug info 
@@ -261,7 +261,17 @@ function main() {
         script_exit "wrong options" 9
     fi
     [[ "$PRINT_MODE" = "silent" ]] && PRINT_TERMINAL=false
-        
+    
+    # TIMESTAMP
+    ( [[ ! "$TIMESTAMP" = "+"* ]] || [[ ! "$TIMESTAMP" =~ "%" ]]) \
+        && [[ "$TIMESTAMP" != "" ]]\
+        && print_log "Wrong format for \$TIMESTAMP: $TIMESTAMP" "ERROR" \
+        && script_exit "wrong options" 9
+    
+    
+    # Init for build
+    #----------------------------
+    
     # Copy the user scripts
     mkdir -p $PATH_USERSCRIPTS
     cp -r "$USERSCRIPTS_DIR"/. $PATH_USERSCRIPTS
