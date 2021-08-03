@@ -85,7 +85,6 @@
 
 # Logs
 #----------------------------
-    TIMESTAMP=`date +%d/%m/%Y-%T`
     DOCKER_LOG="/var/log/docker.log"
     LOG_NAME="Lineage_docker_$(date +%Y%m%d).log"
     LOG_FILE=$LOGS_DIR/$LOG_NAME

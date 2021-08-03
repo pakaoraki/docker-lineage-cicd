@@ -37,8 +37,9 @@
 #     CONST
 ###############################################################################
 
-# Const...
-#---------------------------- 
+# Logs
+#----------------------------
+    TIMESTAMP='+%d/%m/%Y-%T'
 
 ###############################################################################
 #     FUNCTIONS
@@ -410,12 +411,12 @@ function print_log() {
     #test -t 1 && echo " [$type_of_msg] `date "+%Y.%m.%d-%H:%M:%S %Z"` [$run_unit]  [@$host_name] [$$] ""$msg"
     #if [[ -z ${quiet-} ]]; then 
     if [[ $PRINT_TERMINAL = true ]]; then
-        pretty_print "[$type_of_msg][$TIMESTAMP]: ""$msg" $format_color           
+        pretty_print "[$type_of_msg][`date $TIMESTAMP`]: ""$msg" $format_color           
     fi
     
     # Write line to log file (if --no-log param not present)
     if [[ -z ${no_log-} ]]; then  
-        echo "[$type_of_msg][$TIMESTAMP]: ""$msg" >> $logs_file
+        echo "[$type_of_msg][`date $TIMESTAMP`]: ""$msg" >> $logs_file
     fi
 }
 
