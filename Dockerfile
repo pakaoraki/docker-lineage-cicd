@@ -170,7 +170,7 @@ RUN mkdir -p $MIRROR_DIR $SRC_DIR $TMP_DIR $CCACHE_DIR $ZIP_DIR $LMANIFEST_DIR \
 # Install build dependencies
 ############################
 RUN apt-get -qq update && \
-      apt-get install -y jq bc bison bsdmainutils build-essential ccache cgpt clang \
+      apt-get install -y tzdata jq bc bison bsdmainutils build-essential ccache cgpt clang \
       cron curl flex g++-multilib gcc-multilib git gnupg gperf imagemagick \
       kmod lib32ncurses5-dev lib32readline-dev lib32z1-dev liblz4-tool \
       libncurses5 libncurses5-dev libsdl1.2-dev libssl-dev libxml2 \
