@@ -220,6 +220,8 @@ Other useful settings are:
 * **`CRONTAB_TIME (now)`:** instead of building immediately and exit, build at the
    specified time (uses standard cron format)
 * **`ZIP_SUBDIR (true)`**: Move the resulting zips to $ZIP_DIR/$codename instead of $ZIP_DIR/
+* **`TIMESTAMP ('+%d/%m/%Y-%T')`**: Tweak the date format used for logs (default settings will show "[03/08/2021-14:02:43]..." for example). See ['date' documentation][man_date] for all options available.
+* **`TZ`**: Modify local time zone, default settings used UTC (ex: `-e "TZ=Europe\Paris"`)
 
   For dev pupose only:
 
@@ -435,6 +437,7 @@ docker run \
 [pakaoraki_image]: https://hub.docker.com/r/pakaoraki/docker-lineage-cicd (Docker image)
 [pakaoraki_src]: https://github.com/pakaoraki/docker-lineage-cicd (pakaoraki Github sources)
 [pakaoraki_local_manifest]: https://github.com/pakaoraki/local_manifests (pakaoraki Github manifest)
+[man_date]: https://man7.org/linux/man-pages/man1/date.1.html (man date)
 [android_build_source]: https://developer.android.com/reference/tools/gradle-api/4.1/com/android/build/api/variant/Variant
 [xda_starlte]: https://forum.xda-developers.com/t/rom-s9-s9-unofficial-lineageos-18-1-21-03-2021.4203777/ (XDA Forum S9/S9+ Lineage 18.1)
 [xda2_starlte]: https://forum.xda-developers.com/t/rom-s9-s9-unofficial-lineageos-18-1-weekly.4302901/ (XDA Forum S9/S9+ - weekly - Lineage 18.1)
