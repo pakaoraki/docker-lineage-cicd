@@ -555,8 +555,15 @@ function build_lineageos() {
                 rm -rf ./*
             else
                 cd "$source_dir" || exit
-                #mka clean &>> "$LOG_BUILD"
+                
+                # Authorize unbound variables for 'brunch' function in envsetup.sh
+                set +o nounset 
+                
+                # Clean cmd from envsetup.sh
                 mka clean | print_log_catcher $LOG_BUILD
+                
+                # Exit script if unbound variables (like before)
+                set -o nounset
             fi
         fi
     fi
