@@ -182,6 +182,8 @@ function main() {
     colour_init
     #lock_init system
 
+    # logs rotate
+    log_rotate LOG_FILE
 
     # Debug
     #---------------------------- 
@@ -230,7 +232,6 @@ function main() {
     print_log " -\$SIGNATURE_SPOOFING: $SIGNATURE_SPOOFING "     "DEBUG"
     print_log " -\$DELETE_OLD_ZIPS: $DELETE_OLD_ZIPS "           "DEBUG"
     print_log " -\$DELETE_OLD_LOGS: $DELETE_OLD_LOGS "           "DEBUG"
-    print_log " -\$MIRROR_DIR: $MIRROR_DIR "                     "DEBUG"
     print_log " -\$SRC_DIR: $SRC_DIR "                           "DEBUG"
     print_log " -\$TMP_DIR: $TMP_DIR "                           "DEBUG"
     print_log " -\$CCACHE_DIR: $CCACHE_DIR "                     "DEBUG"

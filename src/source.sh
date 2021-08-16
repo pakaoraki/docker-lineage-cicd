@@ -416,6 +416,35 @@ function print_log() {
     fi
 }
 
+# log_rotate()
+#----------------------------
+# DESC: Change name of the log file if needed
+# ARGS: $1 (required): Log file var name.
+# OUTS: None
+function log_rotate() {
+
+    # Check
+    if [[ $# -lt 1 ]]; then
+        script_exit 'Missing required argument to log_rotate()!' 2
+    fi
+
+    # local
+    local int=0
+    local max_file=50
+    local __log_file=$1
+    local log_full_name=${!1}
+    local name_pattern=$log_full_name
+    
+    while test -f "$log_full_name" && [ $int -le $max_file ]
+    do  
+        log_full_name=${name_pattern/.log/}"_$int.log"
+        int=$((int+1))
+    done
+    
+    # Update log var with new value
+    eval $__log_file="'$log_full_name'"
+}
+
 # verbose_print()
 #----------------------------
 # DESC: Only pretty_print() the provided string if verbose mode is enabled

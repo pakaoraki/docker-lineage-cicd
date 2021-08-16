@@ -385,6 +385,9 @@ function build_lineageos() {
         # Define log file for each build
         LOG_BUILD="$LOGS_DIR/$logsubdir/"
         LOG_BUILD+="lineage-$los_ver-$build_date-$RELEASE_TYPE-$codename.log"
+        
+        # logs rotate
+        log_rotate LOG_BUILD
 
         # Exec custom pre-build scripts
         if [ -f $CUSTOM_SCRIPT_PRE_BUILD ]; then
@@ -589,6 +592,9 @@ function main() {
     cron_init
     colour_init
     #lock_init system
+    
+    # logs rotate
+    log_rotate LOG_REPO
 
     # Set PRINT_MODE    
     case $PRINT_MODE in 
