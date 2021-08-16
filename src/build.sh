@@ -563,7 +563,7 @@ function build_lineageos() {
                 set +o nounset 
                 
                 # Clean cmd from envsetup.sh
-                mka clean | print_log_catcher $LOG_BUILD
+                mka clean | print_log_catcher "$LOG_BUILD" "BUILD"
                 
                 # Exit script if unbound variables (like before)
                 set -o nounset
