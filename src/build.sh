@@ -334,12 +334,13 @@ function build_lineageos() {
         HEURE_START=$( date -d@$TIME_START +"%H:%M - %S seconde" )
         
         # Sync repo if needed
-        if [ "$build_date" != "$currentdate" ]; then
+        if [[ "$build_date" != "$currentdate" ]] \
+            && [[ "$REPO_SYNC" = true ]]; then
                         
             # Sync the source code
             build_date=$currentdate
 
-            if [ "$LOCAL_MIRROR" = true ]; then
+            if [[ "$LOCAL_MIRROR" = true ]]; then
                 print_log " >> Syncing mirror repository" "INFO" $LOG_REPO
                 cd "$MIRROR_DIR" || exit
                 repo sync --force-sync --no-clone-bundle 2>&1 \
@@ -756,16 +757,18 @@ function main() {
         fi
         
         # Sync repo
-        print_log ">> Syncing mirror repository" $LOG_REPO
-        repo sync \
-            --force-sync \
-            --no-clone-bundle 2>&1 \
-            | print_log_catcher $LOG_REPO "REPO" \
-            || EXIT_CODE=$?
+        if [[ "$REPO_SYNC" = true ]]; then
+            print_log ">> Syncing mirror repository" $LOG_REPO
+            repo sync \
+                --force-sync \
+                --no-clone-bundle 2>&1 \
+                | print_log_catcher $LOG_REPO "REPO" \
+                || EXIT_CODE=$?
 
-        [[ $EXIT_CODE -ne 0 ]] \
-            && print_log "repo sync failed ! see $LOG_REPO"  "ERROR" \
-            && script_exit 3 
+            [[ $EXIT_CODE -ne 0 ]] \
+                && print_log "repo sync failed ! see $LOG_REPO"  "ERROR" \
+                && script_exit 3 
+        fi
     fi
 
     # Build for each branch
@@ -874,7 +877,7 @@ function main() {
                 || EXIT_CODE=$?
             
             [[ $EXIT_CODE -ne 0 ]] \
-                && print_log "repo rsync failed ! see $LOG_REPO"  "ERROR" \
+                && print_log "rsync manifest failed ! see $LOG_REPO"  "ERROR" \
                 && script_exit 3 
                 
             rm -f .repo/local_manifests/proprietary.xml
@@ -890,17 +893,21 @@ function main() {
                     .repo/local_manifests/proprietary_gitlab.xml 
             fi
             
-            # Sync repo
-            print_log " >> Syncing branch repository" "INFO" $LOG_REPO
+            # Init buildate
             builddate=$(date +%Y%m%d)
-            repo sync -c --force-sync 2>&1 \
-                    | print_log_catcher $LOG_REPO "REPO" \
-                    || EXIT_CODE=$?
-             
-            [[ $EXIT_CODE -ne 0 ]] \
-                && print_log "repo sync  failed ! see $LOG_REPO"  "ERROR" \
-                && script_exit 3 
-                
+            
+            # Sync repo
+            if [[ "$REPO_SYNC" = true ]]; then
+                print_log " >> Syncing branch repository" "INFO" $LOG_REPO                
+                repo sync -c --force-sync 2>&1 \
+                        | print_log_catcher $LOG_REPO "REPO" \
+                        || EXIT_CODE=$?
+                 
+                [[ $EXIT_CODE -ne 0 ]] \
+                    && print_log "repo sync  failed ! see $LOG_REPO"  "ERROR" \
+                    && script_exit 3 
+            fi
+            
             if [ ! -d "vendor/$vendor" ]; then
                 print_log " >> Missing \"vendor/$vendor\", aborting"  "ERROR"
                 script_exit 4
