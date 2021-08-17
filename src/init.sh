@@ -340,14 +340,6 @@ function main() {
     print_log " -\$SIGNATURE_SPOOFING: $SIGNATURE_SPOOFING "     "DEBUG"
     print_log " -\$DELETE_OLD_ZIPS: $DELETE_OLD_ZIPS "           "DEBUG"
     print_log " -\$DELETE_OLD_LOGS: $DELETE_OLD_LOGS "           "DEBUG"
-    print_log " -\$SRC_DIR: $SRC_DIR "                           "DEBUG"
-    print_log " -\$TMP_DIR: $TMP_DIR "                           "DEBUG"
-    print_log " -\$CCACHE_DIR: $CCACHE_DIR "                     "DEBUG"
-    print_log " -\$ZIP_DIR: $ZIP_DIR "                           "DEBUG"
-    print_log " -\$LMANIFEST_DIR: $LMANIFEST_DIR "               "DEBUG"
-    print_log " -\$LOGS_DIR: $LOGS_DIR "                         "DEBUG"
-    print_log " -\$USERSCRIPTS_DIR: $USERSCRIPTS_DIR "           "DEBUG"
-    print_log " -\$SRC_DIR: $SRC_DIR "                           "DEBUG"  
     print_log "------------------------------------------------" "DEBUG"  
     print_log " -\$BUILD_SCRIPT: $BUILD_SCRIPT "                 "DEBUG"  
     print_log " -\$GEN_KEY_SCRIPT: $GEN_KEY_SCRIPT "             "DEBUG"  
@@ -418,7 +410,6 @@ function main() {
             print_log "  => $KEYS_DIR: generating new keys !" "INFO"
             for c in releasekey platform shared media networkstack; do
                 print_log " >> Generating $c keys..."     "INFO"
-                #$GEN_KEY_SCRIPT "$KEYS_DIR/$c" "$KEYS_SUBJECT" <<< '' &> /dev/null
                 make_keys "$KEYS_DIR/$c" "$KEYS_SUBJECT"
             done
         else
@@ -437,8 +428,6 @@ function main() {
         fi
         for c in cyngn{-priv,}-app testkey; do
             for e in pk8 x509.pem; do
-                #ln -s releasekey.$e "$KEYS_DIR/$c.$e" 2> /dev/null
-                #echo "releasekey.$e $KEYS_DIR/$c.$e"
                 if ! test -f "$KEYS_DIR/$c.$e"; then
                     ln -s releasekey.$e "$KEYS_DIR/$c.$e" \
                         2>&1 | print_log_catcher \
