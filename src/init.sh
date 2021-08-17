@@ -100,6 +100,7 @@
     SILENT_REPO=""
     SILENT_BUILD=""
     SHOW_ERRORS_ONLY=""
+    EXIT_CODE=""
     
 ###############################################################################
 #     FUNCTIONS
@@ -159,6 +160,113 @@ function parse_params() {
                 ;;
         esac
     done
+}
+
+# make_keys()
+#----------------------------
+# DESC: Usage 'make_keys <name> <subject> [<keytype>]'
+#       Creates <name>.pk8 key and <name>.x509.pem cert. Cert contains the
+#       given <subject>. A keytype of "rsa" or "ec" is accepted.
+# ARGS: $1 (required): name.
+#       $2 (required): subject.
+#       $3 (optional): password.
+#       $4 (optional): keytype [rsa|ec].
+# OUTS: Variables indicating command-line parameters and options
+
+function make_keys() {
+
+    # Check 
+    if [[ "$#" -lt 2 || "$#" -gt 4 ]]; then
+        print_log "makekeys: wrong number of arguments" "ERROR"
+        script_exit "wrong args in makekeys" 9
+    fi
+
+    # local
+    local name=$1
+    local subject=$2    
+    local keytype="rsa" # Default
+    local password=""
+    
+    # Get password if provided
+    [[ "$#" -eq 3 ]] && password=$3
+    
+    # Get keytype if provided
+    [[ "$#" -eq 4 ]] && keytype=$4   
+    
+    # Debug
+    print_log "Name: ------ $name"      "DEBUG"
+    print_log "Subject: --- $subject"   "DEBUG"  
+    print_log "Password: -- $password"  "DEBUG"  
+    print_log "keytype: --- $keytype"   "DEBUG"  
+    
+    if [[ -e "$name.pk8" || -e "$name.x509.pem" ]]; then
+        print_log "$name.pk8 and/or $name.x509.pem already exist !" "WARN"
+        print_log "Please delete them first if you want to replace them." "WARN"
+
+        # Exit function
+        return 1
+    fi
+
+    # Use named pipes to connect get the raw RSA private key to the cert-
+    # and .pk8-creating programs, to avoid having the private key ever
+    # touch the disk.
+
+    tmpdir=$(mktemp -d)
+    trap 'rm -rf ${tmpdir}; echo; exit 1' EXIT INT QUIT
+
+    one=${tmpdir}/one
+    two=${tmpdir}/two
+    mknod "${one}" p
+    mknod "${two}" p
+    chmod 0600 "${one}" "${two}"
+    
+    #print_log "Enter password for '$name' " "INFO"
+    #read -rp "(blank for none; password will be visible): " \
+    #   password
+
+    if [[ "${keytype}" = "rsa" ]]; then
+        ( openssl genrsa -f4 2048 | tee "${one}" > "${two}" ) &> /dev/null &
+        hash="-sha256"
+    elif [ "${keytype}" = "ec" ]; then
+        ( openssl ecparam -name prime256v1 -genkey -noout \
+            | tee "${one}" > "${two}" ) &> /dev/null &
+        hash="-sha256"
+    else
+        print_log "makekeys: Only accepts RSA or EC keytypes." "ERROR"
+        script_exit "makekeys failed" 9
+    fi
+
+    openssl req -new -x509 ${hash} -key "${two}" -out "$name".x509.pem \
+        -days 10000 -subj "$2" &> /dev/null &
+
+    if [ "${password}" == "" ]; then
+        print_log " makekeys: creating ${name}.pk8 with no password" "INFO"
+        openssl pkcs8 \
+            -in "${one}" \
+            -topk8 -outform DER \
+            -out "$name".pk8 \
+            -nocrypt \
+            &> /dev/null || EXIT_CODE=$?           
+    else
+        print_log " makekeys: creating ${name}.pk8 with given password." "INFO"
+        export password
+        openssl pkcs8 \
+            -in "${one}" \
+            -topk8 -outform DER \
+            -out "$name".pk8 \
+            -passout env:password \
+            &> /dev/null || EXIT_CODE=$? 
+        unset password
+    fi
+    
+    # check openssl cmd
+    [[ $EXIT_CODE -ne 0 ]] \
+        && print_log "ERROR: failed creating ${name}.pk8 !"  "ERROR" \
+        && script_exit "makekeys failed" 9 
+    
+    # Wait for previous background openssl command to end
+    wait
+    wait
 }
 
 ###############################################################################
@@ -237,7 +345,6 @@ function main() {
     print_log " -\$CCACHE_DIR: $CCACHE_DIR "                     "DEBUG"
     print_log " -\$ZIP_DIR: $ZIP_DIR "                           "DEBUG"
     print_log " -\$LMANIFEST_DIR: $LMANIFEST_DIR "               "DEBUG"
-    print_log " -\$KEYS_DIR: $KEYS_DIR "                         "DEBUG"
     print_log " -\$LOGS_DIR: $LOGS_DIR "                         "DEBUG"
     print_log " -\$USERSCRIPTS_DIR: $USERSCRIPTS_DIR "           "DEBUG"
     print_log " -\$SRC_DIR: $SRC_DIR "                           "DEBUG"  
@@ -310,8 +417,9 @@ function main() {
             print_log " SIGN_BUILDS : no keys provided..."    "INFO"
             print_log "  => $KEYS_DIR: generating new keys !" "INFO"
             for c in releasekey platform shared media networkstack; do
-                print_log " Generating $c..."     "INFO"
-                $GEN_KEY_SCRIPT "$KEYS_DIR/$c" "$KEYS_SUBJECT" <<< '' &> /dev/null
+                print_log " >> Generating $c keys..."     "INFO"
+                #$GEN_KEY_SCRIPT "$KEYS_DIR/$c" "$KEYS_SUBJECT" <<< '' &> /dev/null
+                make_keys "$KEYS_DIR/$c" "$KEYS_SUBJECT"
             done
         else
             for c in releasekey platform shared media networkstack; do
