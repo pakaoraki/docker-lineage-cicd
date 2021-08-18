@@ -38,6 +38,9 @@ ENV TEST_SCRIPT false
 
 # *******************
 
+# Enable repo sync before building
+ENV REPO_SYNC 'true'
+
 # Select what to print on the screen (does not apply to logs)
 # all|silent|no_repo|no_build|no_repo_build|build_errors
 ENV PRINT_MODE 'all'

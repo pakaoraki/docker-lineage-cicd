@@ -21,10 +21,12 @@ The sources scripts have been made by following the best practices from <https:/
 List of changes made:
 
 1. Add new options for building:
-   * __`BUILD_VARIANT`__ : allow to choose buildtype (userdebug, user,eng).
-   * __`PRINT_MODE`__: change output behavior (silent mode, hide build output...).
-   * __`DEBUG_MODE`__, __`TRACE_MODE`__: debug options.
-   * __`TEST_SCRIPT`__: ability to exec custom script without building for testing purpose.
+	* __`BUILD_VARIANT`__ : allow to choose buildtype (userdebug, user,eng).
+	* __`REPO_SYNC`__ : enable/disable repo sync.
+	* __`PRINT_MODE`__: change output behavior (silent mode, hide build output...).
+	* __`DEBUG_MODE`__, __`TRACE_MODE`__: debug options.
+	* __`TEST_SCRIPT`__: ability to exec custom script without building for testing purpose.
+	
 2. Improve logs and screen visibility (add color, detect warning and errors, add new TIMESTAMP).
 3. Do not create 'microg' overlay if not needed (for people who don't use MicroG spoofing patches).
 
@@ -220,6 +222,7 @@ Other useful settings are:
 * **`CRONTAB_TIME (now)`:** instead of building immediately and exit, build at the
    specified time (uses standard cron format)
 * **`ZIP_SUBDIR (true)`**: Move the resulting zips to $ZIP_DIR/$codename instead of $ZIP_DIR/
+* **`REPO_SYNC (true)`** : Set to `false` to disable repo sync before build.
 * **`TIMESTAMP ('+%d/%m/%Y-%T')`**: Tweak the date format used for logs (default settings will show "[03/08/2021-14:02:43]..." for example). See ['date' documentation][man_date] for all options available.
 * **`TZ`**: Modify local time zone, default settings used UTC (ex: `-e "TZ=Europe\Paris"`)
 
