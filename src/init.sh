@@ -299,6 +299,7 @@ function main() {
     # Display debug info 
     print_log "------------------------------------------------" "DEBUG"
     print_log " -\$DEBUG_MODE: $DEBUG_MODE "                     "DEBUG"
+    print_log " -\$REPO_SYNC: $REPO_SYNC "                       "DEBUG"
     print_log " -\$TRACE_MODE: $TRACE_MODE "                     "DEBUG"
     print_log " -\$TEST_SCRIPT: $TEST_SCRIPT "                   "DEBUG"
     print_log " -\$PRINT_MODE: $PRINT_MODE "                     "DEBUG"
@@ -366,6 +367,11 @@ function main() {
     ( [[ ! "$TIMESTAMP" = "+"* ]] || [[ ! "$TIMESTAMP" =~ "%" ]]) \
         && [[ "$TIMESTAMP" != "" ]]\
         && print_log "Wrong format for \$TIMESTAMP: $TIMESTAMP" "ERROR" \
+        && script_exit "wrong options" 9
+        
+    # REPO_SYNC    
+    [[ ! "$REPO_SYNC" =~ ^(true|false)$ ]] \
+        && print_log "Wrong options for \$REPO_SYNC: $REPO_SYNC" "ERROR" \
         && script_exit "wrong options" 9
     
     
