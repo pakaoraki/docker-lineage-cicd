@@ -354,11 +354,6 @@ function build_lineageos() {
         fi
 
         if [ "$BUILD_OVERLAY" = true ]; then
-            #mkdir -p "$TMP_DIR/device" "$TMP_DIR/workdir" "$TMP_DIR/merged"
-            #mount -t overlay overlay -o \
-            #    lowerdir="$SRC_DIR/$branch_dir",\
-            #    upperdir="$TMP_DIR/device",\
-            #    workdir="$TMP_DIR/workdir" "$TMP_DIR/merged"
             lowerdir="$SRC_DIR/$branch_dir"
             upperdir="$TMP_DIR/device"
             workdir="$TMP_DIR/workdir"
@@ -368,7 +363,6 @@ function build_lineageos() {
                 lowerdir="$lowerdir",\
                 upperdir="$upperdir",\
                 workdir="$workdir" "$merged"
-            #source_dir="$TMP_DIR/merged"
             source_dir="$merged"
         else
             source_dir="$SRC_DIR/$branch_dir"
@@ -671,17 +665,14 @@ function main() {
     # Treat DEVICE_LIST as DEVICE_LIST_<first_branch>
     first_branch=$(cut -d ',' -f 1 <<< "$BRANCH_NAME")
     if [ -n "$DEVICE_LIST" ]; then
-        #device_list_first_branch="DEVICE_LIST_$(sed 's/[^[:alnum:]]/_/g' <<< "$first_branch")"
         device_list_first_branch="DEVICE_LIST_${first_branch//[^[:alnum:]]/_}"
         device_list_first_branch=${device_list_first_branch^^}
 
         # Test if DEVICE_LIST_<BRANCH> exist
         if [ ! -z ${!device_list_first_branch+x} ]; then
-            #read "$device_list_first_branch" <<< "$DEVICE_LIST,${!device_list_first_branch}"
             read -r "${device_list_first_branch?}" \
                 <<< "$DEVICE_LIST,${!device_list_first_branch}"
         else
-            #read "$device_list_first_branch" <<< "$DEVICE_LIST"
             read -r "${device_list_first_branch?}" <<< "$DEVICE_LIST"
         fi
     fi
@@ -731,7 +722,6 @@ function main() {
                 2>&1 \
                 | print_log_catcher $LOG_REPO "REPO" \
                 || EXIT_CODE=$?
- #               &>> "$LOG_REPO" \
  
             [[ $EXIT_CODE -ne 0 ]] \
                 && print_log "repo init --mirror failed ! see $LOG_REPO"  \
