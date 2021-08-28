@@ -319,19 +319,23 @@ function build_lineageos() {
         script_exit "" 7
     fi
     
+    # Local
     local codename=$1
     local build_date=$2
     local branch_dir=$3
     local los_ver=$4
+    local time_start=""
+    local heure_start=""
+    local time_end=""
+    local time=""
+    local duree=""
+    local heure_end=""  
+    local build_name=""  
     
     if [ -n "$codename" ]; then
     
         # Date
-        currentdate=$(date +%Y%m%d)
-        
-        # stats
-        TIME_START=$(date +%s)
-        HEURE_START=$( date -d@$TIME_START +"%H:%M - %S seconde" )
+        currentdate=$(date +%Y%m%d)        
         
         # Sync repo if needed
         if [[ "$build_date" != "$currentdate" ]] \
@@ -405,10 +409,24 @@ function build_lineageos() {
 
         # Start the build
         #----------------------------
-                    
+        
+        # Stats
+        time_start=$(date +%s)
+        heure_start=$( date -d@$time_start +"%H:%M - %S seconde" )
+        
+        # Init
+        build_successful=false           
+        build_name="lineage-$los_ver-$build_date-$RELEASE_TYPE-$codename"
+        
+        # Print
+        print_log " ------------------------------------ "  "INFO"  \
+            $LOG_BUILD $fg_yellow
         print_log " >> Starting build for $codename, $branch branch" "INFO" \
-            $LOG_BUILD
-        build_successful=false        
+            $LOG_BUILD $fg_yellow
+        print_log "    Time: $heure_start"                  "INFO"  \
+            $LOG_BUILD $fg_yellow
+        print_log " ------------------------------------ "  "INFO"  \
+            $LOG_BUILD $fg_yellow
         
         # Authorize unbound variables for 'brunch' function in envsetup.sh
         set +o nounset 
@@ -418,9 +436,27 @@ function build_lineageos() {
             | print_log_catcher "$LOG_BUILD" "BUILD" ; then
             
             # Exit script if unbound variables (like before)
-            set -o nounset 
+            set -o nounset             
+            
+            # End Stats
+            time_end=$(date +%s)
+            time=$[$time_end-$time_start]
+            duree=$(date -d@$time -u +"%Hh%Mm%Ss")
+            heure_end=$(date -d@$time_end +"%H:%M - %S seconde")
+            print_log " ------------------------------------ "  "INFO"  \
+                $LOG_BUILD  $fg_yellow
+            print_log " *** BUILD "$build_name" *** "           "INFO"  \
+                $LOG_BUILD  $fg_yellow
+            print_log " => START:       $heure_start"           "INFO"  \
+                $LOG_BUILD  $fg_yellow
+            print_log " => END:         $heure_end"             "INFO"  \
+                $LOG_BUILD  $fg_yellow
+            print_log " => TIME:        $duree"                 "INFO"  \
+                $LOG_BUILD  $fg_yellow
+            print_log " ------------------------------------ "  "INFO"  \
+                $LOG_BUILD  $fg_yellow
        
-            # handle cross date issue 
+            # Handle cross date issue 
             currentdate=$(date +%Y%m%d)
             mv_build="mv {} \$(echo {} | sed \"s|$currentdate|$build_date|\")"
             if [ "$build_date" != "$currentdate" ]; then
@@ -439,7 +475,7 @@ function build_lineageos() {
             
             # Main zip image
             mess_log="Moving build artifacts for "
-            mess_log+="for $codename to '$ZIP_DIR/$zipsubdir'"
+            mess_log+="$codename to '$ZIP_DIR/$zipsubdir'"
             print_log " >> $mess_log" "INFO" $LOG_BUILD
             
             cd out/target/product/"$codename" || exit
@@ -629,6 +665,10 @@ function main() {
     
     # cd to working directory
     cd "$SRC_DIR" || script_exit 0
+    
+    # stats
+    TIME_START=$(date +%s)
+    HEURE_START=$( date -d@$TIME_START +"%H:%M - %S seconde" )
     
     # DEV ONLY - custom scripts
     #----------------------------
@@ -1023,9 +1063,12 @@ function main() {
             fi            
         
             # Build for every devices
-            #----------------------------
+            #----------------------------               
             for codename in ${devices//,/ }; do
-
+                
+                print_log " >> Starting build for $codename, $branch branch" \
+                    "INFO"
+                   
                 # Build
                 build_lineageos $codename $builddate $branch_dir $los_ver
             done
@@ -1053,6 +1096,7 @@ function main() {
     DUREE=$(date -d@$TIME -u +"%Hh%Mm%Ss")
     HEURE_END=$(date -d@$TIME_END +"%H:%M - %S seconde")
     print_log " ------------------------------------ "  "INFO"  "" $fg_yellow
+    print_log " *** TOTAL BUILD PROCESS *** "           "INFO"  "" $fg_yellow
     print_log " => START:       $HEURE_START"           "INFO"  "" $fg_yellow
     print_log " => END:         $HEURE_END"             "INFO"  "" $fg_yellow
     print_log " => TIME:        $DUREE"                 "INFO"  "" $fg_yellow
