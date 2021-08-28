@@ -399,7 +399,6 @@ function build_lineageos() {
             mess_log="Running Pre-build custom scripts for "
             mess_log+="$codename: $CUSTOM_SCRIPT_PRE_BUILD"
             print_log " >> $mess_log" "INFO" $LOG_BUILD
-            #$CUSTOM_SCRIPT_PRE_BUILD "$codename" &>> "$LOG_BUILD"
             $CUSTOM_SCRIPT_PRE_BUILD "$codename" | print_log_catcher "$LOG_BUILD"
         fi
 
@@ -528,8 +527,6 @@ function build_lineageos() {
             mess_log+=" $CUSTOM_SCRIPT_POST_BUILD"
             print_log " >> $mess_log" "INFO"
             
-            #$CUSTOM_SCRIPT_POST_BUILD "$codename" $build_successful \
-            #    &>> "$LOG_BUILD"
             $CUSTOM_SCRIPT_POST_BUILD "$codename" $build_successful \
                 | print_log_catcher $LOG_BUILD
         fi
