@@ -20,6 +20,9 @@ ENV USER root
 # Enable color in terminal
 ENV TERM xterm-256color
 
+# Main log file: will be init in script
+ENV LOG_FILE ''
+
 # Configurable environment variables
 ####################################
 
