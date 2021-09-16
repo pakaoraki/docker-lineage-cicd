@@ -80,7 +80,6 @@
 #----------------------------
     DOCKER_LOG="/var/log/docker.log"
     LOG_NAME="Lineage_docker_$(date +%Y%m%d).log"
-    LOG_FILE=$LOGS_DIR/$LOG_NAME
     LOG_REPO="$LOGS_DIR/repo-$(date +%Y%m%d).log"
     LOG_BUILD="" # Init later     
     
