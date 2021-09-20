@@ -926,7 +926,7 @@ function main() {
           
             # Include proprietary
             if [ "$INCLUDE_PROPRIETARY" = true ]; then
-                wget -q -O .repo/local_manifests/proprietary.xml 
+                wget -q -O .repo/local_manifests/proprietary.xml \
                     "$GITHUB_MUPPET_URL/$themuppets_branch/muppets.xml"
                 /root/build_manifest.py \
                     --remote "https://gitlab.com" \
