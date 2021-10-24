@@ -80,7 +80,7 @@
 #----------------------------
     DOCKER_LOG="/var/log/docker.log"
     LOG_NAME="Lineage_docker_$(date +%Y%m%d).log"
-    LOG_REPO="$LOGS_DIR/repo-$(date +%Y%m%d).log"
+    LOG_REPO="$LOGS_DIR/REPO/repo-$(date +%Y%m%d).log"
     LOG_BUILD="" # Init later     
     
 # Path
@@ -632,6 +632,9 @@ function main() {
     cron_init
     colour_init
     #lock_init system
+    
+    # Create specific folder for "repo" logs
+    mkdir -p $( dirname "$LOG_REPO" )
     
     # logs rotate
     log_rotate LOG_REPO
