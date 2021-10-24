@@ -6,7 +6,7 @@ Docker microservice for LineageOS Continuous Integration and Continuous Deployme
 
 This version is not the original made by lineageos4microg.
 
-The __`pakaoraki/docker-lineage-cicd`__ is a partly re-writed docker image of the original [lineageos4microg/docker-lineage-cicd][lineageos4microg_docker] ([sources][lineageos4microg_src].
+The __`pakaoraki/docker-lineage-cicd`__ is a partly re-writed docker image of the original [lineageos4microg/docker-lineage-cicd][lineageos4microg_docker] ([sources][lineageos4microg_src]).
 
 The original docker image was targeting MicroG spoofing modification for Lineageos. This re-writed version is focus for a pure vanilla Lineageos build. 
 However, all MicroG patches options are still available as original lineageos4microg.
