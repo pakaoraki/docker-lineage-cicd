@@ -675,6 +675,9 @@ function main() {
     TIME_START=$(date +%s)
     HEURE_START=$( date -d@$TIME_START +"%H:%M - %S seconde" )
     
+    # Print local user
+    print_log "Local user: $USER" "INFO"
+    
     # DEV ONLY - custom scripts
     #----------------------------
     if [ "$TEST_SCRIPT" = true ]; then

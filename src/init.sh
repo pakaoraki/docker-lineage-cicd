@@ -477,11 +477,11 @@ function main() {
             -exec chmod +x {} \;      
                 
         # Update user ownership on files
-        print_log "Local user: update ownership on /srv/src" "INFO"
+        print_log "Update ownership of user $LOCAL_USER on /srv/src" "INFO"
         chown -R "$LOCAL_USER:$LOCAL_USER" /srv/src/*
-        print_log "Local user: update ownership on /srv/zips" "INFO"
+        print_log "Update ownership of user $LOCAL_USER on /srv/zips" "INFO"
         chown -R "$LOCAL_USER:$LOCAL_USER" /srv/zips/*
-        print_log "Local user: update ownership on /srv/logs" "INFO"
+        print_log "Update ownership of user $LOCAL_USER on /srv/logs" "INFO"
         chown -R "$LOCAL_USER:$LOCAL_USER" /srv/logs/*        
     fi
 
@@ -490,11 +490,14 @@ function main() {
         
     # Check crontab
     if [ "$CRONTAB_TIME" = "now" ]; then
-    
+
         # Execute build script
-        [[ "$LOCAL_USER" != "false" ]] \
-            && sudo -H -u"${LOCAL_USER}" $BUILD_SCRIPT 2> /dev/null \
-            || $BUILD_SCRIPT        
+        if [[ "$LOCAL_USER" != "false" ]]; then
+            su "${LOCAL_USER}" -c $BUILD_SCRIPT
+        else
+            echo "with root !"
+            $BUILD_SCRIPT
+        fi        
     else    
         # Initialize the cronjob
         cronFile=/tmp/buildcron
@@ -507,9 +510,11 @@ function main() {
         crontab_cmd+="/usr/bin/flock -n /var/lock/build.lock $BUILD_SCRIPT"
         printf "$crontab_cmd >> $DOCKER_LOG 2>&1\n" >> $cronFile
         #crontab $cronFile
-        [[ "$LOCAL_USER" != "false" ]] \
-            && sudo -H -u"${LOCAL_USER}" crontab $cronFile \
-            || crontab $cronFile      
+        if [[ "$LOCAL_USER" != "false" ]]; then
+            su "${LOCAL_USER}" -c crontab $cronFile
+        else
+            crontab $cronFile    
+        fi  
         rm $cronFile
 
         # Run crond in foreground
