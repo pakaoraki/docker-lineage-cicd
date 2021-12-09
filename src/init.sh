@@ -91,7 +91,6 @@
 # Path
 #----------------------------
     PATH_USERSCRIPTS="$USER_DIR/userscripts"
-    #GEN_KEY_SCRIPT="$USER_DIR/make_key"
     BUILD_SCRIPT="$USER_DIR/build.sh"
     
 # Common
@@ -349,7 +348,6 @@ function main() {
     print_log " -\$DELETE_OLD_LOGS: $DELETE_OLD_LOGS "           "DEBUG"
     print_log "------------------------------------------------" "DEBUG"  
     print_log " -\$BUILD_SCRIPT: $BUILD_SCRIPT "                 "DEBUG"  
-#    print_log " -\$GEN_KEY_SCRIPT: $GEN_KEY_SCRIPT "             "DEBUG"  
     print_log " -\$PATH_USERSCRIPTS: $PATH_USERSCRIPTS "         "DEBUG"  
     print_log " -\$DOCKER_LOG: $DOCKER_LOG "                     "DEBUG"
  
