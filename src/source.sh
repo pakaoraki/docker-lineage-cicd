@@ -572,6 +572,58 @@ function run_as_root() {
     fi
 }
 
+# create_user()
+#----------------------------
+# DESC: Create a local user with given uid, guid and username.
+# ARGS: $1 (required): username
+#       $2 (required): uid
+#       $3 (required): guid
+#       $4 (optional): groupname
+# OUTS: None
+function create_user() {
+
+    # Check
+    if [[ $# -lt 3 ]]; then
+        script_exit 'Missing required argument to create_user()!' 2
+    fi
+    
+    # Local
+    local local_username="$1"
+    local local_uid="$2"
+    local local_guid="$3"
+    local local_group=$local_username
+    [[ $# -eq 4 ]] && local_group="$4"
+    
+    # check to see if group exists; if not, create it
+	if grep -q -E "^${local_group}:" /etc/group > /dev/null 2>&1; then
+        print_log "Create group: Group exists; skipping creation" "DEBUG"
+	else
+        print_log "Create group: Group doesn't exist; creating..." "DEBUG"
+        # create the group
+        addgroup --gid "${local_guid}" "${local_group}" \
+            || (print_log "Group exists but with a different name" "DEBUG"; \
+            print_log "Renaming..." "DEBUG"; \
+            groupmod --gid "${local_guid}" -n "${local_group}" \
+            "$(awk -F ':' '{print $1":"$3}' < /etc/group \
+            | grep ":${local_guid}$" | awk -F ":" '{print $1}')")
+	fi
+
+	# check to see if user exists; if not, create it
+	if id -u "${local_username}" > /dev/null 2>&1; then
+        print_log "INFO: User exists; skipping creation" ""
+	else
+        print_log "INFO: User doesn't exist; creating..." ""
+	  
+        # create the user
+        adduser --gecos "" --uid "${local_uid}" \
+            --ingroup "${local_group}" \
+            --home "/home/${local_username}" \
+            --shell "/bin/sh" \
+            --disabled-password \
+            "${local_username}"
+	fi    
+}
+
 # print_log_catcher()
 #----------------------------
 # DESC: use while to send text piped in print_log()
