@@ -16,7 +16,6 @@ ENV USERSCRIPTS_DIR /srv/userscripts
 
 ENV DEBIAN_FRONTEND noninteractive
 ENV USER root
-#ENV USER lineage_builder
 
 # Enable color in terminal
 ENV TERM xterm-256color
