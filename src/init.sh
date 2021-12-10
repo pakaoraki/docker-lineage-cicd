@@ -77,12 +77,6 @@
 #----------------------------
     VERSION="1.0"
 
-# Path
-#----------------------------
-    PATH_USERSCRIPTS="/root/userscripts"
-    GEN_KEY_SCRIPT="/root/make_key"
-    BUILD_SCRIPT="/root/build.sh"
-
 # Logs
 #----------------------------
     DOCKER_LOG="/var/log/docker.log"
@@ -94,6 +88,11 @@
 #     VARIABLES
 ###############################################################################
 
+# Path
+#----------------------------
+    PATH_USERSCRIPTS="$USER_DIR/userscripts"
+    BUILD_SCRIPT="$USER_DIR/build.sh"
+    
 # Common
 #----------------------------
     PRINT_TERMINAL=true
@@ -101,6 +100,8 @@
     SILENT_BUILD=""
     SHOW_ERRORS_ONLY=""
     EXIT_CODE=""
+    LOC_UID=""
+    LOC_GUID=""
     
 ###############################################################################
 #     FUNCTIONS
@@ -292,12 +293,16 @@ function main() {
 
     # logs rotate
     log_rotate LOG_FILE
+    
 
     # Debug
     #---------------------------- 
 
     # Display debug info 
     print_log "------------------------------------------------" "DEBUG"
+    print_log " -\$LOCAL_USER: $LOCAL_USER "                     "DEBUG"
+    print_log " -\$USER_DIR: $USER_DIR "                         "DEBUG"
+    print_log " -\$LOCAL_UID: $LOCAL_UID "                       "DEBUG"
     print_log " -\$DEBUG_MODE: $DEBUG_MODE "                     "DEBUG"
     print_log " -\$REPO_SYNC: $REPO_SYNC "                       "DEBUG"
     print_log " -\$TRACE_MODE: $TRACE_MODE "                     "DEBUG"
@@ -343,7 +348,6 @@ function main() {
     print_log " -\$DELETE_OLD_LOGS: $DELETE_OLD_LOGS "           "DEBUG"
     print_log "------------------------------------------------" "DEBUG"  
     print_log " -\$BUILD_SCRIPT: $BUILD_SCRIPT "                 "DEBUG"  
-    print_log " -\$GEN_KEY_SCRIPT: $GEN_KEY_SCRIPT "             "DEBUG"  
     print_log " -\$PATH_USERSCRIPTS: $PATH_USERSCRIPTS "         "DEBUG"  
     print_log " -\$DOCKER_LOG: $DOCKER_LOG "                     "DEBUG"
  
@@ -373,7 +377,7 @@ function main() {
     [[ ! "$REPO_SYNC" =~ ^(true|false)$ ]] \
         && print_log "Wrong options for \$REPO_SYNC: $REPO_SYNC" "ERROR" \
         && script_exit "wrong options" 9
-    
+        
     
     # Init for build
     #----------------------------
@@ -445,17 +449,64 @@ function main() {
         done
     fi
 
-    
+    # Init local user
+    #----------------------------
+    if [[ "$LOCAL_USER" != "false" ]]; then
+        print_log " => Change user for $LOCAL_USER" "INFO"
+        
+        # Create user
+        LOC_UID=$(echo $LOCAL_UID | cut -d: -f1 )
+        LOC_GUID=$(echo $LOCAL_UID | cut -d: -f2 )
+        create_user "$LOCAL_USER" "$LOC_UID" "$LOC_GUID" \
+            | print_log_catcher "$LOG_FILE" "" "DEBUG"
+        
+        # Add to sudo
+        adduser "${LOCAL_USER}" sudo | print_log_catcher "$LOG_FILE" "" "DEBUG"
+        
+        # Update script path
+        USER_DIR="/home/$LOCAL_USER"
+        PATH_USERSCRIPTS="$USER_DIR/userscripts"
+        BUILD_SCRIPT="$USER_DIR/build.sh"
+        
+        # Copy scripts from /root
+        cp -R /root/* "$USER_DIR/"
+        chown -R "${LOCAL_USER}:${LOCAL_USER}" "$USER_DIR"
+        #chmod +x "$USER_DIR/*.sh"
+        #chmod +x "$USER_DIR/*.py"
+        find "$USER_DIR/" -type f \( -iname \*.sh -o -iname \*.py \) \
+            -exec chmod +x {} \;      
+                
+        # Update user ownership on files
+        print_log "Update ownership of user $LOCAL_USER on /srv/src" "INFO"
+        chown -R "$LOCAL_USER:$LOCAL_USER" /srv/src/*
+        print_log "Update ownership of user $LOCAL_USER on /srv/zips" "INFO"
+        chown -R "$LOCAL_USER:$LOCAL_USER" /srv/zips/*
+        print_log "Update ownership of user $LOCAL_USER on /srv/logs" "INFO"
+        chown -R "$LOCAL_USER:$LOCAL_USER" /srv/logs/*     
+        print_log "Update ownership of user $LOCAL_USER on /srv/tmp" "INFO"
+        chown -R "$LOCAL_USER:$LOCAL_USER" /srv/tmp
+        print_log "Update ownership of user $LOCAL_USER on /srv/keys" "INFO"
+        chown -R "$LOCAL_USER:$LOCAL_USER" /srv/keys
+        print_log "Update ownership of user $LOCAL_USER on /srv/ccache" "INFO"
+        chown -R "$LOCAL_USER:$LOCAL_USER" /srv/ccache
+        print_log "Update ownership of user $LOCAL_USER on /srv/mirror" "INFO"
+        chown -R "$LOCAL_USER:$LOCAL_USER" /srv/mirror
+    fi
+
     # Building
     #----------------------------
-
+        
     # Check crontab
     if [ "$CRONTAB_TIME" = "now" ]; then
-    
-         # Execute build script
-         $BUILD_SCRIPT        
-    else
-    
+
+        # Execute build script
+        if [[ "$LOCAL_USER" != "false" ]]; then
+            su "${LOCAL_USER}" -c $BUILD_SCRIPT
+        else
+            echo "with root !"
+            $BUILD_SCRIPT
+        fi        
+    else    
         # Initialize the cronjob
         cronFile=/tmp/buildcron
         printf "SHELL=/bin/bash\n" > $cronFile
@@ -466,7 +517,12 @@ function main() {
         crontab_cmd="\n$CRONTAB_TIME "
         crontab_cmd+="/usr/bin/flock -n /var/lock/build.lock $BUILD_SCRIPT"
         printf "$crontab_cmd >> $DOCKER_LOG 2>&1\n" >> $cronFile
-        crontab $cronFile
+        #crontab $cronFile
+        if [[ "$LOCAL_USER" != "false" ]]; then
+            su "${LOCAL_USER}" -c crontab $cronFile
+        else
+            crontab $cronFile    
+        fi  
         rm $cronFile
 
         # Run crond in foreground

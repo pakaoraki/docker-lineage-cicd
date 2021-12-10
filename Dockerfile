@@ -41,6 +41,15 @@ ENV TEST_SCRIPT false
 
 # *******************
 
+# Local username to create and use (default 'false': use root).
+ENV LOCAL_USER 'false'
+
+# If local username is used, need local uid and guid (<UID>:<GUID>).
+ENV LOCAL_UID '1001:1001'
+
+# Default user dir
+ENV USER_DIR '/root'
+
 # Enable repo sync before building
 ENV REPO_SYNC 'true'
 
@@ -176,7 +185,7 @@ RUN mkdir -p $MIRROR_DIR $SRC_DIR $TMP_DIR $CCACHE_DIR $ZIP_DIR $LMANIFEST_DIR \
 # Install build dependencies
 ############################
 RUN apt-get -qq update && \
-      apt-get install -y tzdata jq bc bison bsdmainutils build-essential ccache cgpt clang \
+      apt-get install -y sudo tzdata jq bc bison bsdmainutils build-essential ccache cgpt clang \
       cron curl flex g++-multilib gcc-multilib git gnupg gperf imagemagick \
       kmod lib32ncurses5-dev lib32readline-dev lib32z1-dev liblz4-tool \
       libncurses5 libncurses5-dev libsdl1.2-dev libssl-dev libxml2 \
@@ -190,16 +199,16 @@ RUN curl https://storage.googleapis.com/git-repo-downloads/repo > /usr/local/bin
 
 # Copy required files
 #####################
-COPY src/ /root/
-
-# Set the work directory
-########################
-WORKDIR $SRC_DIR
+COPY src/ /$USER_DIR/
 
 # Allow redirection of stdout to docker logs
 ############################################
 RUN ln -sf /proc/1/fd/1 /var/log/docker.log
 
+# Set the work directory
+########################
+WORKDIR $SRC_DIR
+
 # Set the entry point to init.sh
 ################################
-ENTRYPOINT /root/init.sh
+ENTRYPOINT /$USER_DIR/init.sh

@@ -26,6 +26,8 @@ List of changes made:
 	* __`PRINT_MODE`__: change output behavior (silent mode, hide build output...).
 	* __`DEBUG_MODE`__, __`TRACE_MODE`__: debug options.
 	* __`TEST_SCRIPT`__: ability to exec custom script without building for testing purpose.
+	* __`LOCAL_USER`__: specify a local user for building lineage instead of root.
+	* __`LOCAL_UID`__: add the possibility to give UID/GUID for __LOCAL_USER__, so you can create a local user inside the docker image that have the same uid/guid as the host user for example.
 	
 2. Improve logs and screen visibility (add color, detect warning and errors, add new TIMESTAMP).
 3. Do not create 'microg' overlay if not needed (for people who don't use MicroG spoofing patches).
@@ -225,6 +227,8 @@ Other useful settings are:
 * **`REPO_SYNC (true)`** : Set to `false` to disable repo sync before build.
 * **`TIMESTAMP ('+%d/%m/%Y-%T')`**: Tweak the date format used for logs (default settings will show "[03/08/2021-14:02:43]..." for example). See ['date' documentation][man_date] for all options available.
 * **`TZ`**: Modify local time zone, default settings used UTC (ex: `-e "TZ=Europe\Paris"`)
+* __`LOCAL_USER`__: specify a name of a local user that can be create and used inside the docker image instead of root (`-e "LOCAL_USER=lineage_user"` or `-e "LOCAL_USER=$USER"` to get the same as your host user).
+* __`LOCAL_UID`__: if __LOCAL_USER__ specified, you can set a custom uid/guid, `-e "LOCAL_UID=<uid>:<guid>`. For example, if setting the same as your host user you will keep the same access credential to your files (sources, zips and logs): `-e "LOCAL_UID=$(id -u):$(id -g)"`.
 
   For dev pupose only:
 

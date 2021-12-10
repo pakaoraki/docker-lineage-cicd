@@ -85,8 +85,11 @@
     
 # Path
 #----------------------------
-    PATH_USERSCRIPTS="/root/userscripts"    
-    
+    PATH_USERSCRIPTS="$USER_DIR/userscripts"
+    CLEAN_UP_SCRIPT="$USER_DIR/clean_up.py"
+    BUILD_MANIFEST_SCRIPT="$USER_DIR/build_manifest.py"    
+    PCK_UPDATER_XML="$USER_DIR/packages_updater_strings.xml"
+        
 # Custom scripts
 #----------------------------
     CUSTOM_SCRIPT_BEGIN="$PATH_USERSCRIPTS/begin.sh"   # To exec at start  
@@ -114,7 +117,7 @@
     
 # Patch MicroG spoofing
 #----------------------------      
-    PATCH_SIGN_SPOOF_DIR="/root/signature_spoofing_patches"
+    PATCH_SIGN_SPOOF_DIR="$USER_DIR/signature_spoofing_patches"
     OVERLAY_MICROG_FRAM="overlay/microg/frameworks/base/core/res/res/values/"    
 
 # Sign Lineagesos build
@@ -256,7 +259,7 @@ function microg_signature_spoofing() {
         patch_str='s/android:protectionLevel="dangerous"'
         patch_str+='/android:protectionLevel="signature|privileged"/'
         sed $patch_str \
-            "/root/signature_spoofing_patches/$patch_name" \
+            "$USER_DIR/signature_spoofing_patches/$patch_name" \
             | patch --quiet --force -p1 2>&1 \
             || EXIT_CODE=$?
     fi
@@ -523,13 +526,13 @@ function build_lineageos() {
         # Remove old zips
         if [ "$DELETE_OLD_ZIPS" -gt "0" ]; then
             if [ "$ZIP_SUBDIR" = true ]; then
-                /usr/bin/python /root/clean_up.py \
+                /usr/bin/python $CLEAN_UP_SCRIPT \
                     -n "$DELETE_OLD_ZIPS" \
                     -V "$los_ver" \
                     -N 1 \
                     "$ZIP_DIR/$zipsubdir"
             else
-                /usr/bin/python /root/clean_up.py \
+                /usr/bin/python $CLEAN_UP_SCRIPT \
                     -n "$DELETE_OLD_ZIPS" \
                     -V "$los_ver" \
                     -N 1 \
@@ -541,13 +544,13 @@ function build_lineageos() {
         # Remove old logs
         if [ "$DELETE_OLD_LOGS" -gt "0" ]; then
             if [ "$LOGS_SUBDIR" = true ]; then
-                /usr/bin/python /root/clean_up.py \
+                /usr/bin/python $CLEAN_UP_SCRIPT \
                     -n "$DELETE_OLD_LOGS" \
                     -V "$los_ver" \
                     -N 1 \
                     "$LOGS_DIR/$logsubdir"
             else
-                /usr/bin/python /root/clean_up.py \
+                /usr/bin/python $CLEAN_UP_SCRIPT \
                     -n "$DELETE_OLD_LOGS" \
                     -V "$los_ver" \
                     -N 1 \
@@ -672,6 +675,9 @@ function main() {
     TIME_START=$(date +%s)
     HEURE_START=$( date -d@$TIME_START +"%H:%M - %S seconde" )
     
+    # Print local user
+    print_log "Local user: $USER" "INFO"
+    
     # DEV ONLY - custom scripts
     #----------------------------
     if [ "$TEST_SCRIPT" = true ]; then
@@ -794,7 +800,7 @@ function main() {
         if [ "$INCLUDE_PROPRIETARY" = true ]; then
             wget -q -O .repo/local_manifests/proprietary.xml \
                 "$GITHUB_MUPPET_SRC"
-            /root/build_manifest.py \
+            $BUILD_MANIFEST_SCRIPT \
                 --remote "https://gitlab.com" \
                 --remotename "gitlab_https" "$GITLAB_MUPPET_SRC" \
                 .repo/local_manifests/proprietary_gitlab.xml
@@ -931,7 +937,7 @@ function main() {
             if [ "$INCLUDE_PROPRIETARY" = true ]; then
                 wget -q -O .repo/local_manifests/proprietary.xml \
                     "$GITHUB_MUPPET_URL/$themuppets_branch/muppets.xml"
-                /root/build_manifest.py \
+                $BUILD_MANIFEST_SCRIPT \
                     --remote "https://gitlab.com" \
                     --remotename "gitlab_https" \
                     "$GITLAB_MUPPET_URL/$themuppets_branch/muppets.xml" \
@@ -1003,7 +1009,7 @@ function main() {
                     # full URL (with placeholders {device}, {type} and {incr})
                     ota_new_conf="s|{name}|updater_server_url|g; s|{url}"
                     ota_new_conf+="|$OTA_URL/v1/{device}/{type}/{incr}|g"
-                    sed $ota_new_conf /root/packages_updater_strings.xml \
+                    sed $ota_new_conf "$PCK_UPDATER_XML" \
                         > "$updater_url_overlay_dir/strings.xml"
                         
                 elif grep -q conf_update_server_url_def $OTA_UPDATER_STRING; then
@@ -1011,7 +1017,7 @@ function main() {
                     # "Old" updater configuration: just the URL
                     ota_old_conf="s|{name}|conf_update_server_url_def"
                     ota_old_conf+="|g; s|{url}|$OTA_URL|g"      
-                    sed "$ota_old_conf" /root/packages_updater_strings.xml \
+                    sed "$ota_old_conf" "$PCK_UPDATER_XML" \
                         > "$updater_url_overlay_dir/strings.xml"
                 else
                     print_og " >> ERROR: no known Updater URL property found" \
