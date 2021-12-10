@@ -482,7 +482,15 @@ function main() {
         print_log "Update ownership of user $LOCAL_USER on /srv/zips" "INFO"
         chown -R "$LOCAL_USER:$LOCAL_USER" /srv/zips/*
         print_log "Update ownership of user $LOCAL_USER on /srv/logs" "INFO"
-        chown -R "$LOCAL_USER:$LOCAL_USER" /srv/logs/*        
+        chown -R "$LOCAL_USER:$LOCAL_USER" /srv/logs/*     
+        print_log "Update ownership of user $LOCAL_USER on /srv/tmp" "INFO"
+        chown -R "$LOCAL_USER:$LOCAL_USER" /srv/tmp
+        print_log "Update ownership of user $LOCAL_USER on /srv/keys" "INFO"
+        chown -R "$LOCAL_USER:$LOCAL_USER" /srv/keys
+        print_log "Update ownership of user $LOCAL_USER on /srv/ccache" "INFO"
+        chown -R "$LOCAL_USER:$LOCAL_USER" /srv/ccache
+        print_log "Update ownership of user $LOCAL_USER on /srv/mirror" "INFO"
+        chown -R "$LOCAL_USER:$LOCAL_USER" /srv/mirror
     fi
 
     # Building
