@@ -672,6 +672,7 @@ function print_log_catcher() {
             [[ $line == *"fatal "* ]] \
                 || [[ $line == *"failed "* ]]  \
                 || [[ $line == *"error:"* ]] \
+                || [[ $line == *" Error "* ]] \
                 || [[ $line == *"Segmentation fault (core dumped)"* ]] \
                 && type_of_log_line="ERROR"
                 
