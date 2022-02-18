@@ -891,8 +891,16 @@ function main() {
                     cd "$SRC_DIR/$branch_dir" || exit
                 fi
             done
+            
+            # Make sure repo utility repository is up to date before re-init
+            # and force syncing to avoid sync issues
+            if test -d ".repo/repo";then                
+                cd ".repo/repo"
+                git pull &> /dev/null || true
+                cd ../..
+            fi
 
-
+            # Re-init repo
             print_log " >> (Re)initializing branch repository" "INFO" $LOG_REPO
             if [ "$LOCAL_MIRROR" = true ]; then
                 (yes || true) | repo init \
