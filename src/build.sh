@@ -224,21 +224,23 @@ function parse_params() {
 #       $3 (required): permission controller patch
 # OUTS: None
 function microg_signature_spoofing() {
-
-    local $vendor=$1
-    local $patch_name=$2
-    local $permissioncontroller_patch=$3
+    
+    # Local
+    local _vendor=$1
+    local _frameworks_base_patch=$2
+    local _apps_permissioncontroller_patch=$3
+    local _modules_permission_patch=$4
                 
     # Set up our overlay
-    mkdir -p "vendor/$vendor/overlay/microg/"
-    sed -i "1s;^;PRODUCT_PACKAGE_OVERLAYS := vendor/$vendor/overlay/microg\n;" \
-        "vendor/$vendor/config/common.mk"
+    mkdir -p "vendor/$_vendor/overlay/microg/"
+    sed -i "1s;^;PRODUCT_PACKAGE_OVERLAYS := vendor/$_vendor/overlay/microg\n;" \
+        "vendor/$_vendor/config/common.mk"
 
     # Determine which patch should be applied to the current Android source tree
     cd frameworks/base || exit
     if [ "$SIGNATURE_SPOOFING" = "yes" ]; then
         mess_log="Applying the standard signature spoofing patch"
-        mess_log+=" ($patch_name) to frameworks/base"
+        mess_log+=" ($_frameworks_base_patch) to frameworks/base"
         print_log " >> $mess_log" "INFO"
         
         mess_log="WARNING: the standard signature spoofing patch"
@@ -249,47 +251,74 @@ function microg_signature_spoofing() {
             --quiet \
             --force \
             -p1 \
-            -i "$PATCH_SIGN_SPOOF_DIR/$patch_name" 2>&1 \
+            -i "$PATCH_SIGN_SPOOF_DIR/$_frameworks_base_patch" 2>&1 \
             || EXIT_CODE=$?
     else
         mess_log="Applying the restricted signature spoofing patch"
-        mess_log+=" (based on $patch_name) to frameworks/base"
+        mess_log+=" (based on $_frameworks_base_patch) to frameworks/base"
         print_log " >> $mess_log" "INFO"
         
         patch_str='s/android:protectionLevel="dangerous"'
         patch_str+='/android:protectionLevel="signature|privileged"/'
         sed $patch_str \
-            "$USER_DIR/signature_spoofing_patches/$patch_name" \
+            "$USER_DIR/signature_spoofing_patches/$_frameworks_base_patch" \
             | patch --quiet --force -p1 2>&1 \
             || EXIT_CODE=$?
     fi
     
     # check patch cmd
     [[ $EXIT_CODE -ne 0 ]] \
-        && print_log "ERROR: failed to apply $patch_name"  "ERROR" \
+        && print_log "ERROR: failed to apply $_frameworks_base_patch"  "ERROR" \
         && script_exit 5 
     git clean -q -f
     cd ../..
 
-    if [ -n "$permissioncontroller_patch" ] \
+    if [ -n "$_apps_permissioncontroller_patch" ] \
         && [ "$SIGNATURE_SPOOFING" = "yes" ]; then
         
         cd packages/apps/PermissionController || exit
         mess_log="Applying the PermissionController patch "
-        mess_log+="($permissioncontroller_patch)"
+        mess_log+="($_apps_permissioncontroller_patch)"
         mess_log+=" to packages/apps/PermissionController"
         print_log " >> $mess_log" "INFO"
         patch \
             --quiet \
             --force \
             -p1 \
-            -i "$PATCH_SIGN_SPOOF_DIR/$permissioncontroller_patch" \
+            -i "$PATCH_SIGN_SPOOF_DIR/$_apps_permissioncontroller_patch" \
             2>&1 \
             || EXIT_CODE=$?
                         
         # check patch cmd
         [[ $EXIT_CODE -ne 0 ]] \
-            && print_log "ERROR: failed to apply $permissioncontroller_patch" \
+            && print_log "ERROR: failed to apply $_apps_permissioncontroller_patch" \
+                "ERROR" \
+            && script_exit 5 
+            
+        git clean -q -f
+        cd ../../..
+    fi
+    
+    if [ -n "$_modules_permission_patch" ] \
+        && [ "$SIGNATURE_SPOOFING" = "yes" ]; then
+        
+        cd packages/modules/Permission
+        mess_log="Applying the modules/Permission patch "
+        mess_log+="($_modules_permission_patch)"
+        mess_log+=" to packages/modules/Permission"
+        print_log " >> $mess_log" "INFO"
+
+        patch \
+            --quiet \
+            --force \
+            -p1 \
+            -i "/root/signature_spoofing_patches/$_modules_permission_patch" \
+            2>&1 \
+            || EXIT_CODE=$?
+            
+        # check patch cmd
+        [[ $EXIT_CODE -ne 0 ]] \
+            && print_log "ERROR: failed to apply $_modules_permission_patch" \
                 "ERROR" \
             && script_exit 5 
             
@@ -298,10 +327,9 @@ function microg_signature_spoofing() {
     fi
 
     # Override device-specific settings for the location providers
-    mkdir -p "vendor/$vendor/$OVERLAY_MICROG_FRAM"
+    mkdir -p "vendor/$_vendor/$OVERLAY_MICROG_FRAM"
     cp $PATCH_SIGN_SPOOF_DIR/frameworks_base_config.xml \
-        "vendor/$vendor/$OVERLAY_MICROG_FRAM/config.xml"
-        
+        "vendor/$_vendor/$OVERLAY_MICROG_FRAM/config.xml"        
         
 }
 
@@ -832,34 +860,41 @@ function main() {
 
         if [ -n "$branch" ] && [ -n "$devices" ]; then
             vendor=lineage
-            permissioncontroller_patch=""
+            apps_permissioncontroller_patch=""
+            modules_permission_patch=""
             case "$branch" in
                 cm-14.1*)
                     vendor="cm"
                     themuppets_branch="cm-14.1"
                     android_version="7.1.2"
-                    patch_name="android_frameworks_base-N.patch"
+                    frameworks_base_patch="android_frameworks_base-N.patch"
                     ;;
                 lineage-15.1*)
                     themuppets_branch="lineage-15.1"
                     android_version="8.1"
-                    patch_name="android_frameworks_base-O.patch"
+                    frameworks_base_patch="android_frameworks_base-O.patch"
                     ;;
                 lineage-16.0*)
                     themuppets_branch="lineage-16.0"
                     android_version="9"
-                    patch_name="android_frameworks_base-P.patch"
+                    frameworks_base_patch="android_frameworks_base-P.patch"
                     ;;
                 lineage-17.1*)
                     themuppets_branch="lineage-17.1"
                     android_version="10"
-                    patch_name="android_frameworks_base-Q.patch"
+                    frameworks_base_patch="android_frameworks_base-Q.patch"
                     ;;
                 lineage-18.1*)
                     themuppets_branch="lineage-18.1"
                     android_version="11"
-                    patch_name="android_frameworks_base-R.patch"
-                    permissioncontroller_patch="packages_apps_PermissionController-R.patch"
+                    frameworks_base_patch="android_frameworks_base-R.patch"
+                    apps_permissioncontroller_patch="packages_apps_PermissionController-R.patch"                    
+                    ;;
+                lineage-19.1*)
+                    themuppets_branch="lineage-19.1"
+                    android_version="12"
+                    frameworks_base_patch="android_frameworks_base-S.patch"
+                    modules_permission_patch="packages_modules_Permission-S.patch"
                     ;;
                 *)
                     print_log " >> Building branch $branch is not (yet) suppported"\
@@ -876,13 +911,18 @@ function main() {
             print_log " >> Branch:  $branch" "INFO"
             print_log " >> Devices: $branch" "INFO"
 
-            # Remove previous changes of vendor/cm,
-            # vendor/lineage and frameworks/base (if they exist)
+            # Remove previous changes of vendor/cm, vendor/lineage, 
+            # frameworks/base, packages/apps/PermissionController and 
+            # packages/modules/Permission (if they exist)
+            #
+            # ** TODO ** : maybe reset everything using:
+            #         https://source.android.com/setup/develop/repo#forall
             path_list=()
             path_list+=( "vendor/cm" )
             path_list+=( "vendor/lineage" )
             path_list+=( "frameworks/base" )
             path_list+=( "packages/apps/PermissionController" )
+            path_list+=( "packages/modules/Permission" )
             for path in ${path_list[@]}; do
                 if [ -d "$path" ]; then
                     cd "$path" || exit
@@ -977,10 +1017,14 @@ function main() {
             #sed -i "1s;^;PRODUCT_PACKAGE_OVERLAYS := vendor/$vendor/overlay/microg\n;" "vendor/$vendor/config/common.mk"
 
             # Get Lineage version
-            los_ver_major=$(sed -n -e 's/^\s*PRODUCT_VERSION_MAJOR = //p'\
-                 "vendor/$vendor/config/common.mk")
-            los_ver_minor=$(sed -n -e 's/^\s*PRODUCT_VERSION_MINOR = //p'\
-                 "vendor/$vendor/config/common.mk")
+            makefile_containing_version="vendor/$vendor/config/common.mk"
+            if [ -f "vendor/$vendor/config/version.mk" ]; then
+              makefile_containing_version="vendor/$vendor/config/version.mk"
+            fi
+            los_ver_major=$(sed -n -e 's/^\s*PRODUCT_VERSION_MAJOR = //p' \
+                "$makefile_containing_version")
+            los_ver_minor=$(sed -n -e 's/^\s*PRODUCT_VERSION_MINOR = //p' \
+                "$makefile_containing_version")            
             los_ver="$los_ver_major.$los_ver_minor"
             
             # MicroG
@@ -992,13 +1036,14 @@ function main() {
                 
                 microg_signature_spoofing \
                     $vendor \
-                    $patch_name \
-                    $permissioncontroller_patch
+                    $frameworks_base_patch \
+                    $apps_permissioncontroller_patch \
+                    $modules_permission_patch
             fi
 
             print_log " >> Setting \"$RELEASE_TYPE\" as release type" "INFO"
-            sed -i "/\$(filter .*\$(${vendor^^}_BUILDTYPE)/,+2d" \
-                "vendor/$vendor/config/common.mk"
+            sed -i "/\$(filter .*\$(${vendor^^}_BUILDTYPE)/,/endif/d" \
+                "$makefile_containing_version"
 
             # OTA
             #----------------------------
