@@ -1043,7 +1043,7 @@ function main() {
 
             print_log " >> Setting \"$RELEASE_TYPE\" as release type" "INFO"
             sed -i "/\$(filter .*\$(${vendor^^}_BUILDTYPE)/,+2d" \
-                "vendor/$vendor/config/common.mk"
+                "$makefile_containing_version"
 
             # OTA
             #----------------------------
