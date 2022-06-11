@@ -1,4 +1,4 @@
-FROM ubuntu:20.04
+FROM ubuntu:22.04
 LABEL maintainer="Pakaoraki <pakaoraki@gmx.com>"
 
 # Environment variables
@@ -190,7 +190,7 @@ RUN apt-get -qq update && \
       kmod lib32ncurses5-dev lib32readline-dev lib32z1-dev liblz4-tool \
       libncurses5 libncurses5-dev libsdl1.2-dev libssl-dev libxml2 \
       libxml2-utils lsof lzop maven openjdk-8-jdk pngcrush procps \
-      python rsync schedtool squashfs-tools wget xdelta3 xsltproc yasm zip \
+      python3 rsync schedtool squashfs-tools wget xdelta3 xsltproc yasm zip \
       zlib1g-dev \
       && rm -rf /var/lib/apt/lists/*
 
