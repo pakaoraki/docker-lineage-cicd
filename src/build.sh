@@ -1042,7 +1042,7 @@ function main() {
             fi
 
             print_log " >> Setting \"$RELEASE_TYPE\" as release type" "INFO"
-            sed -i "/\$(filter .*\$(${vendor^^}_BUILDTYPE)/,+2d" \
+            sed -i "/\$(filter .*\$(${vendor^^}_BUILDTYPE)/,/endif/d" \
                 "$makefile_containing_version"
 
             # OTA
