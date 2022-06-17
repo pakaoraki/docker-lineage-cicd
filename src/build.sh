@@ -1049,14 +1049,14 @@ function main() {
             #----------------------------
             
             # Set a custom updater URI if a OTA URL is provided            
-            if [ -n "$OTA_URL" ] || [ -n "$OTA_URL_FULL" ]; then
+            if [ -n "$OTA_URL" ]; then
                 print_log " >> Adding OTA URL overlay (for custom URL $OTA_URL)" \
                 "INFO"
 
                 updater_url_overlay_dir="vendor/$vendor/$OVERLAY_MICROG_UPDATER"
                 mkdir -p "$updater_url_overlay_dir"
 
-                if grep -q updater_server_url $OTA_UPDATER_STRING; tOTA hen
+                if grep -q updater_server_url $OTA_UPDATER_STRING; then
         
                     # "New" updater configuration:                    
                     ota_new_conf="s|{name}|updater_server_url|g; s|{url}"
