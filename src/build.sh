@@ -1049,27 +1049,32 @@ function main() {
             #----------------------------
             
             # Set a custom updater URI if a OTA URL is provided            
-            if [ -n "$OTA_URL" ]; then
+            if [ -n "$OTA_URL" ] || [ -n "$OTA_URL_FULL" ]; then
                 print_log " >> Adding OTA URL overlay (for custom URL $OTA_URL)" \
                 "INFO"
 
                 updater_url_overlay_dir="vendor/$vendor/$OVERLAY_MICROG_UPDATER"
                 mkdir -p "$updater_url_overlay_dir"
 
-                if grep -q updater_server_url $OTA_UPDATER_STRING; then
+                if grep -q updater_server_url $OTA_UPDATER_STRING; tOTA hen
         
-                    # "New" updater configuration: 
-                    # full URL (with placeholders {device}, {type} and {incr})
+                    # "New" updater configuration:                    
                     ota_new_conf="s|{name}|updater_server_url|g; s|{url}"
-                    ota_new_conf+="|$OTA_URL/v1/{device}/{type}/{incr}|g"
-                    sed $ota_new_conf "$PCK_UPDATER_XML" \
+                    if [[ "$OTA_URL" == *".json" ]]; then
+                        # Full URL with .json file
+                        ota_new_conf+="|$OTA_URL|g"
+                    else
+                        # URL (with placeholders {device}, {type} and {incr})
+                        ota_new_conf+="|$OTA_URL/v1/{device}/{type}/{incr}|g"
+                    fi
+                    sed "$ota_new_conf" "$PCK_UPDATER_XML" \
                         > "$updater_url_overlay_dir/strings.xml"
                         
                 elif grep -q conf_update_server_url_def $OTA_UPDATER_STRING; then
  
                     # "Old" updater configuration: just the URL
-                    ota_old_conf="s|{name}|conf_update_server_url_def"
-                    ota_old_conf+="|g; s|{url}|$OTA_URL|g"      
+                    ota_old_conf="s|{name}|conf_update_server_url_def"  
+                    ota_old_conf+="|g; s|{url}|$OTA_URL_FULL|g" 
                     sed "$ota_old_conf" "$PCK_UPDATER_XML" \
                         > "$updater_url_overlay_dir/strings.xml"
                 else
