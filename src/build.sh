@@ -1073,8 +1073,8 @@ function main() {
                 elif grep -q conf_update_server_url_def $OTA_UPDATER_STRING; then
  
                     # "Old" updater configuration: just the URL
-                    ota_old_conf="s|{name}|conf_update_server_url_def"  
-                    ota_old_conf+="|g; s|{url}|$OTA_URL_FULL|g" 
+                    ota_old_conf="s|{name}|conf_update_server_url_def"
+                    ota_old_conf+="|g; s|{url}|$OTA_URL|g" 
                     sed "$ota_old_conf" "$PCK_UPDATER_XML" \
                         > "$updater_url_overlay_dir/strings.xml"
                 else
