@@ -1012,9 +1012,7 @@ function main() {
                 script_exit 4
             fi
 
-            # Set up MicroG overlay
-            #mkdir -p "vendor/$vendor/overlay/microg/"
-            #sed -i "1s;^;PRODUCT_PACKAGE_OVERLAYS := vendor/$vendor/overlay/microg\n;" "vendor/$vendor/config/common.mk"
+            
 
             # Get Lineage version
             makefile_containing_version="vendor/$vendor/config/common.mk"
@@ -1028,6 +1026,18 @@ function main() {
             los_ver="$los_ver_major.$los_ver_minor"
             
             # MicroG
+            #----------------------------
+            
+            # Set up MicroG overlay
+            if [ "$SIGNATURE_SPOOFING" = "yes" ] || [ -n "$OTA_URL" ]; then
+                print_log " >> Adding MICROG overlay" "INFO"  
+                mkdir -p "vendor/$vendor/overlay/microg/"
+                sed -i "1s;^;PRODUCT_PACKAGE_OVERLAYS := vendor/$vendor/overlay/microg\n;" \
+                    "vendor/$vendor/config/common.mk"
+            fi
+            
+            
+            # Spoofing
             #----------------------------
 
             # If needed, apply the microG's signature spoofing patch
