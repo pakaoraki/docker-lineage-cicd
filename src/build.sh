@@ -1010,11 +1010,7 @@ function main() {
             if [ ! -d "vendor/$vendor" ]; then
                 print_log " >> Missing \"vendor/$vendor\", aborting"  "ERROR"
                 script_exit 4
-            fi
-
-            # Set up MicroG overlay
-            #mkdir -p "vendor/$vendor/overlay/microg/"
-            #sed -i "1s;^;PRODUCT_PACKAGE_OVERLAYS := vendor/$vendor/overlay/microg\n;" "vendor/$vendor/config/common.mk"
+            fi            
 
             # Get Lineage version
             makefile_containing_version="vendor/$vendor/config/common.mk"
@@ -1027,7 +1023,23 @@ function main() {
                 "$makefile_containing_version")            
             los_ver="$los_ver_major.$los_ver_minor"
             
+            # Set release type
+            print_log " >> Setting \"$RELEASE_TYPE\" as release type" "INFO"
+            sed -i "/\$(filter .*\$(${vendor^^}_BUILDTYPE)/,/endif/d" \
+                "$makefile_containing_version"                
+            
             # MicroG
+            #----------------------------
+            
+            # Set up MicroG overlay
+            if [ "$SIGNATURE_SPOOFING" = "yes" ] || [ -n "$OTA_URL" ]; then
+                print_log " >> Adding MICROG overlay" "INFO"  
+                mkdir -p "vendor/$vendor/overlay/microg/"
+                sed -i "1s;^;PRODUCT_PACKAGE_OVERLAYS := vendor/$vendor/overlay/microg\n;" \
+                    "vendor/$vendor/config/common.mk"
+            fi            
+            
+            # Spoofing
             #----------------------------
 
             # If needed, apply the microG's signature spoofing patch
@@ -1040,10 +1052,6 @@ function main() {
                     $apps_permissioncontroller_patch \
                     $modules_permission_patch
             fi
-
-            print_log " >> Setting \"$RELEASE_TYPE\" as release type" "INFO"
-            sed -i "/\$(filter .*\$(${vendor^^}_BUILDTYPE)/,/endif/d" \
-                "$makefile_containing_version"
 
             # OTA
             #----------------------------
@@ -1058,18 +1066,23 @@ function main() {
 
                 if grep -q updater_server_url $OTA_UPDATER_STRING; then
         
-                    # "New" updater configuration: 
-                    # full URL (with placeholders {device}, {type} and {incr})
+                    # "New" updater configuration:                    
                     ota_new_conf="s|{name}|updater_server_url|g; s|{url}"
-                    ota_new_conf+="|$OTA_URL/v1/{device}/{type}/{incr}|g"
-                    sed $ota_new_conf "$PCK_UPDATER_XML" \
+                    if [[ "$OTA_URL" == *".json" ]]; then
+                        # Full URL with .json file
+                        ota_new_conf+="|$OTA_URL|g"
+                    else
+                        # URL (with placeholders {device}, {type} and {incr})
+                        ota_new_conf+="|$OTA_URL/v1/{device}/{type}/{incr}|g"
+                    fi
+                    sed "$ota_new_conf" "$PCK_UPDATER_XML" \
                         > "$updater_url_overlay_dir/strings.xml"
                         
                 elif grep -q conf_update_server_url_def $OTA_UPDATER_STRING; then
  
                     # "Old" updater configuration: just the URL
                     ota_old_conf="s|{name}|conf_update_server_url_def"
-                    ota_old_conf+="|g; s|{url}|$OTA_URL|g"      
+                    ota_old_conf+="|g; s|{url}|$OTA_URL|g" 
                     sed "$ota_old_conf" "$PCK_UPDATER_XML" \
                         > "$updater_url_overlay_dir/strings.xml"
                 else
