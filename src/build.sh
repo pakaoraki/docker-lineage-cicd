@@ -1010,9 +1010,7 @@ function main() {
             if [ ! -d "vendor/$vendor" ]; then
                 print_log " >> Missing \"vendor/$vendor\", aborting"  "ERROR"
                 script_exit 4
-            fi
-
-            
+            fi            
 
             # Get Lineage version
             makefile_containing_version="vendor/$vendor/config/common.mk"
@@ -1025,6 +1023,11 @@ function main() {
                 "$makefile_containing_version")            
             los_ver="$los_ver_major.$los_ver_minor"
             
+            # Set release type
+            print_log " >> Setting \"$RELEASE_TYPE\" as release type" "INFO"
+            sed -i "/\$(filter .*\$(${vendor^^}_BUILDTYPE)/,/endif/d" \
+                "$makefile_containing_version"                
+            
             # MicroG
             #----------------------------
             
@@ -1034,8 +1037,7 @@ function main() {
                 mkdir -p "vendor/$vendor/overlay/microg/"
                 sed -i "1s;^;PRODUCT_PACKAGE_OVERLAYS := vendor/$vendor/overlay/microg\n;" \
                     "vendor/$vendor/config/common.mk"
-            fi
-            
+            fi            
             
             # Spoofing
             #----------------------------
@@ -1050,10 +1052,6 @@ function main() {
                     $apps_permissioncontroller_patch \
                     $modules_permission_patch
             fi
-
-            print_log " >> Setting \"$RELEASE_TYPE\" as release type" "INFO"
-            sed -i "/\$(filter .*\$(${vendor^^}_BUILDTYPE)/,/endif/d" \
-                "$makefile_containing_version"
 
             # OTA
             #----------------------------
