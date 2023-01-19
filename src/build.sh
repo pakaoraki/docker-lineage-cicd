@@ -896,6 +896,12 @@ function main() {
                     frameworks_base_patch="android_frameworks_base-S.patch"
                     modules_permission_patch="packages_modules_Permission-S.patch"
                     ;;
+                lineage-20.0*)
+                    themuppets_branch="lineage-20.0"
+                    android_version="13"
+                    frameworks_base_patch="android_frameworks_base-T.patch"
+                    modules_permission_patch="packages_modules_Permission-S.patch"
+                    ;;
                 *)
                     print_log " >> Building branch $branch is not (yet) suppported"\
                         "ERROR"
