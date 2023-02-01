@@ -300,6 +300,7 @@ function main() {
 
     # Display debug info 
     print_log "------------------------------------------------" "DEBUG"
+    print_log " -\$NO_LOGS: $NO_LOGS "                           "DEBUG"
     print_log " -\$LOCAL_USER: $LOCAL_USER "                     "DEBUG"
     print_log " -\$USER_DIR: $USER_DIR "                         "DEBUG"
     print_log " -\$LOCAL_UID: $LOCAL_UID "                       "DEBUG"

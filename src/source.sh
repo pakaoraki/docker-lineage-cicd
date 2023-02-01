@@ -411,7 +411,7 @@ function print_log() {
     fi
     
     # Write line to log file (if --no-log param not present)
-    if [[ -z ${no_log-} ]]; then  
+    if ! $NO_LOGS; then  
         echo "[$type_of_msg][`date $TIMESTAMP`]: ""$msg" >> $logs_file
     fi
 }
