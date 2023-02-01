@@ -440,8 +440,8 @@ function main() {
             # so people who have built earlier might not yet have them
             for c in sdk_sandbox bluetooth; do
                 if [ ! -f "$KEYS_DIR/$c.pk8" ]; then
-                    echo ">> [$(date)]  Generating $c..."
-                    /root/make_key "$KEYS_DIR/$c" "$KEYS_SUBJECT" <<< '' &> /dev/null
+                    print_log " >> Generating $c keys..."     "INFO"
+                    make_keys "$KEYS_DIR/$c" "$KEYS_SUBJECT"
                 fi
             done
         fi
