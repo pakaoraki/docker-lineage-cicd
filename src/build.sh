@@ -626,7 +626,7 @@ function build_lineageos() {
                 $LOG_BUILD
             if [ "$BUILD_OVERLAY" = true ]; then
                 cd "$TMP_DIR" || exit
-                rm -rf ./*
+                rm -rf ./* || true
             else
                 cd "$source_dir" || exit
                 
