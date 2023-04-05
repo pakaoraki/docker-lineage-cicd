@@ -300,6 +300,7 @@ function main() {
 
     # Display debug info 
     print_log "------------------------------------------------" "DEBUG"
+    print_log " -\$NO_LOGS: $NO_LOGS "                           "DEBUG"
     print_log " -\$LOCAL_USER: $LOCAL_USER "                     "DEBUG"
     print_log " -\$USER_DIR: $USER_DIR "                         "DEBUG"
     print_log " -\$LOCAL_UID: $LOCAL_UID "                       "DEBUG"
@@ -418,7 +419,7 @@ function main() {
         if [ -z "$(ls -A "$KEYS_DIR")" ]; then
             print_log " SIGN_BUILDS : no keys provided..."    "INFO"
             print_log "  => $KEYS_DIR: generating new keys !" "INFO"
-            for c in releasekey platform shared media networkstack; do
+            for c in releasekey platform shared media networkstack sdk_sandbox bluetooth; do
                 print_log " >> Generating $c keys..."     "INFO"
                 make_keys "$KEYS_DIR/$c" "$KEYS_SUBJECT"
             done
@@ -434,6 +435,15 @@ function main() {
                         script_exit "$KEYS_DIR/$c.$e\" is missing" 1
                     fi
                 done
+            done
+            
+            # Those keys are only required starting with android-20, 
+            # so people who have built earlier might not yet have them
+            for c in sdk_sandbox bluetooth; do
+                if [ ! -f "$KEYS_DIR/$c.pk8" ]; then
+                    print_log " >> Generating $c keys..."     "INFO"
+                    make_keys "$KEYS_DIR/$c" "$KEYS_SUBJECT"
+                fi
             done
         fi
         for c in cyngn{-priv,}-app testkey; do

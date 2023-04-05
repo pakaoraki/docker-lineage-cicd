@@ -139,6 +139,9 @@ ENV ZIP_SUBDIR true
 # Write the verbose logs to $LOGS_DIR/$codename instead of $LOGS_DIR/
 ENV LOGS_SUBDIR true
 
+# Set true to disable logs
+ENV NO_LOGS false
+
 # Apply the MicroG's signature spoofing patch
 # Valid values are "no", "yes" (for the original MicroG's patch) and
 # "restricted" (to grant the permission only to the system privileged apps).
@@ -186,7 +189,7 @@ RUN mkdir -p $MIRROR_DIR $SRC_DIR $TMP_DIR $CCACHE_DIR $ZIP_DIR $LMANIFEST_DIR \
 ############################
 RUN apt-get -qq update && \
       apt-get install -y sudo tzdata jq bc bison bsdmainutils build-essential ccache cgpt clang \
-      cron curl flex g++-multilib gcc-multilib git gnupg gperf imagemagick \
+      cron curl flex g++-multilib gcc-multilib git git-lfs gnupg gperf imagemagick \
       kmod lib32ncurses5-dev lib32readline-dev lib32z1-dev liblz4-tool \
       libncurses5 libncurses5-dev libsdl1.2-dev libssl-dev libxml2 \
       libxml2-utils lsof lzop maven openjdk-8-jdk pngcrush procps \

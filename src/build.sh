@@ -523,11 +523,11 @@ function build_lineageos() {
                 2>&1 \
                 | print_log_catcher $LOG_BUILD
                 
-            # recovery image file
-            recovery_name="lineage-$los_ver-$build_date"
-            recovery_name+="-$RELEASE_TYPE-$codename-recovery.img"
+            # recovery image file            
             for image in recovery boot; do
                 if [ -f "$image.img" ]; then
+                        recovery_name="lineage-$los_ver-$build_date"
+                        recovery_name+="-$RELEASE_TYPE-$codename-$image.img"
                         cp -v "$image.img" "$ZIP_DIR/$zipsubdir/$recovery_name" \
                             | print_log_catcher $LOG_BUILD
                     break
@@ -894,6 +894,12 @@ function main() {
                     themuppets_branch="lineage-19.1"
                     android_version="12"
                     frameworks_base_patch="android_frameworks_base-S.patch"
+                    modules_permission_patch="packages_modules_Permission-S.patch"
+                    ;;
+                lineage-20.0*)
+                    themuppets_branch="lineage-20.0"
+                    android_version="13"
+                    frameworks_base_patch="android_frameworks_base-T.patch"
                     modules_permission_patch="packages_modules_Permission-S.patch"
                     ;;
                 *)
