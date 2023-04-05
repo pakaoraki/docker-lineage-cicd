@@ -511,6 +511,7 @@ function build_lineageos() {
             cd out/target/product/"$codename" || exit
             for build in lineage-*.zip; do
                 sha256sum "$build" > "$ZIP_DIR/$zipsubdir/$build.sha256sum"
+                md5sum "$build" > "$ZIP_DIR/$zipsubdir/$build.md5sum"
                 cp -v system/build.prop "$ZIP_DIR/$zipsubdir/$build.prop" \
                     2>&1 \
                     | print_log_catcher $LOG_BUILD
