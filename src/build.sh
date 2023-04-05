@@ -795,6 +795,7 @@ function main() {
                 --mirror \
                 --no-clone-bundle \
                 -p linux \
+                --git-lfs \
                 2>&1 \
                 | print_log_catcher $LOG_REPO "REPO" \
                 || EXIT_CODE=$?
@@ -953,12 +954,14 @@ function main() {
                     -u $GITHUB_ANDROID \
                     --reference "$MIRROR_DIR" \
                     -b "$branch" 2>&1 \
+                    --git-lfs \
                    | print_log_catcher $LOG_REPO "REPO" \
                    || EXIT_CODE=$?
             else   
                 (yes || true) | repo init \
                     -u $GITHUB_ANDROID \
                     -b "$branch" 2>&1 \
+                    --git-lfs \
                    | print_log_catcher $LOG_REPO "REPO" \
                    || EXIT_CODE=$?
             fi
