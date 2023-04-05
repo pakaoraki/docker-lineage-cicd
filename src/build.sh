@@ -514,15 +514,10 @@ function build_lineageos() {
                 cp -v system/build.prop "$ZIP_DIR/$zipsubdir/$build.prop" \
                     2>&1 \
                     | print_log_catcher $LOG_BUILD
+                mv "$build" "$ZIP_DIR/$zipsubdir/" 2>&1 \
+                    | print_log_catcher $LOG_BUILD
             done
-            
-            find . \
-                -maxdepth 1 \
-                -name 'lineage-*.zip*' \
-                -type f -exec mv {} "$ZIP_DIR/$zipsubdir/" \; \
-                2>&1 \
-                | print_log_catcher $LOG_BUILD
-                
+
             # recovery image file            
             for image in recovery boot; do
                 if [ -f "$image.img" ]; then
