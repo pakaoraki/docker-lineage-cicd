@@ -1162,7 +1162,7 @@ function main() {
     # Clean old logs
     if [ "$DELETE_OLD_LOGS" -gt "0" ]; then
         find "$LOGS_DIR" -maxdepth 1 -name 'repo-*.log' \
-            | sort | head -n -"$DELETE_OLD_LOGS" | xargs -r rm
+            | sort | head -n -"$DELETE_OLD_LOGS" | xargs -r rm || true
     fi
 
     # Exec custom scripts after building
