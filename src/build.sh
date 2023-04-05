@@ -510,30 +510,36 @@ function build_lineageos() {
             print_log " >> $mess_log" "INFO" $LOG_BUILD
             
             cd out/target/product/"$codename" || exit
+            files_to_hash=()
             for build in lineage-*.zip; do
-                sha256sum "$build" > "$ZIP_DIR/$zipsubdir/$build.sha256sum"
-                md5sum "$build" > "$ZIP_DIR/$zipsubdir/$build.md5sum"
                 cp -v system/build.prop "$ZIP_DIR/$zipsubdir/$build.prop" \
                     2>&1 \
                     | print_log_catcher $LOG_BUILD
                 mv "$build" "$ZIP_DIR/$zipsubdir/" 2>&1 \
                     | print_log_catcher $LOG_BUILD
+                files_to_hash+=( "$build" )
             done
 
             # recovery image file            
             for image in recovery boot; do
                 if [ -f "$image.img" ]; then
-                        recovery_name="lineage-$los_ver-$build_date"
-                        recovery_name+="-$RELEASE_TYPE-$codename-$image.img"
-                        cp -v "$image.img" "$ZIP_DIR/$zipsubdir/$recovery_name" \
-                            | print_log_catcher $LOG_BUILD
-                    break
+                    recovery_name="lineage-$los_ver-$build_date"
+                    recovery_name+="-$RELEASE_TYPE-$codename-$image.img"
+                    cp -v "$image.img" "$ZIP_DIR/$zipsubdir/$recovery_name" \
+                        | print_log_catcher $LOG_BUILD
+                    files_to_hash+=( "$recovery_name" )
                 fi
             done            
             
+            # Generate sha256sum
+            cd "$ZIP_DIR/$zipsubdir"
+            for f in "${files_to_hash[@]}"; do
+                sha256sum "$f" > "$ZIP_DIR/$zipsubdir/$f.sha256sum"
+            done
+          
             cd "$source_dir" || exit
             
-            # Successfull build
+            # Successful build
             build_successful=true
         else
             # Build failed
