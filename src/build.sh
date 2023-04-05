@@ -609,7 +609,8 @@ function build_lineageos() {
                 | awk '{ print $2 }' \
                 | sort -u \
                 | xargs -r kill \
-                &> /dev/null
+                &> /dev/null \
+                || true
 
             while lsof | grep -q "$TMP_DIR"/merged; do
                 sleep 1
