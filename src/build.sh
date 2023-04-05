@@ -521,7 +521,7 @@ function build_lineageos() {
             done
 
             # recovery image file            
-            for image in recovery boot; do
+            for image in recovery boot vendor_boot; do
                 if [ -f "$image.img" ]; then
                     recovery_name="lineage-$los_ver-$build_date"
                     recovery_name+="-$RELEASE_TYPE-$codename-$image.img"
