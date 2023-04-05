@@ -722,7 +722,8 @@ function main() {
     #----------------------------
     if [ -f $CUSTOM_SCRIPT_BEGIN ]; then
         print_log "Running begin custom scripts: $CUSTOM_SCRIPT_BEGIN" "INFO"
-        $CUSTOM_SCRIPT_BEGIN
+        $CUSTOM_SCRIPT_BEGIN || print_log "WARNING: $CUSTOM_SCRIPT_BEGIN failed !" \
+                "WARN"
     fi
     
     # Init build
@@ -1138,7 +1139,8 @@ function main() {
                 mess_log="Running before custom scripts:"
                 mess_log+="$CUSTOM_SCRIPT_BEFORE"
                 print_log " >> $mess_log" "INFO"
-                $CUSTOM_SCRIPT_BEFORE
+                $CUSTOM_SCRIPT_BEFORE || print_log "WARNING: $CUSTOM_SCRIPT_BEFORE failed !" \
+                "WARN"
             fi            
         
             # Build for every devices
@@ -1163,7 +1165,8 @@ function main() {
     # Exec custom scripts after building
     if [ -f $CUSTOM_SCRIPT_AFTER ]; then
         print_log " >> Running end custom scripts: $CUSTOM_SCRIPT_AFTER" "INFO"
-        $CUSTOM_SCRIPT_AFTER
+        $CUSTOM_SCRIPT_AFTER || print_log "WARNING: $CUSTOM_SCRIPT_AFTER failed !" \
+                "WARN"
     fi
     
     # End
