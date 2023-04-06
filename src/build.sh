@@ -433,7 +433,8 @@ function build_lineageos() {
             mess_log="Running Pre-build custom scripts for "
             mess_log+="$codename: $CUSTOM_SCRIPT_PRE_BUILD"
             print_log " >> $mess_log" "INFO" $LOG_BUILD
-            $CUSTOM_SCRIPT_PRE_BUILD "$codename" | print_log_catcher "$LOG_BUILD"
+            $CUSTOM_SCRIPT_PRE_BUILD "$codename" | print_log_catcher "$LOG_BUILD" \
+                 || print_log "WARNING: $CUSTOM_SCRIPT_PRE_BUILD failed !" "WARN"
         fi
 
 
@@ -509,34 +510,36 @@ function build_lineageos() {
             print_log " >> $mess_log" "INFO" $LOG_BUILD
             
             cd out/target/product/"$codename" || exit
+            files_to_hash=()
             for build in lineage-*.zip; do
-                sha256sum "$build" > "$ZIP_DIR/$zipsubdir/$build.sha256sum"
                 cp -v system/build.prop "$ZIP_DIR/$zipsubdir/$build.prop" \
                     2>&1 \
                     | print_log_catcher $LOG_BUILD
+                mv "$build" "$ZIP_DIR/$zipsubdir/" 2>&1 \
+                    | print_log_catcher $LOG_BUILD
+                files_to_hash+=( "$build" )
             done
-            
-            find . \
-                -maxdepth 1 \
-                -name 'lineage-*.zip*' \
-                -type f -exec mv {} "$ZIP_DIR/$zipsubdir/" \; \
-                2>&1 \
-                | print_log_catcher $LOG_BUILD
-                
+
             # recovery image file            
-            for image in recovery boot; do
+            for image in recovery boot vendor_boot; do
                 if [ -f "$image.img" ]; then
-                        recovery_name="lineage-$los_ver-$build_date"
-                        recovery_name+="-$RELEASE_TYPE-$codename-$image.img"
-                        cp -v "$image.img" "$ZIP_DIR/$zipsubdir/$recovery_name" \
-                            | print_log_catcher $LOG_BUILD
-                    break
+                    recovery_name="lineage-$los_ver-$build_date"
+                    recovery_name+="-$RELEASE_TYPE-$codename-$image.img"
+                    cp -v "$image.img" "$ZIP_DIR/$zipsubdir/$recovery_name" \
+                        | print_log_catcher $LOG_BUILD
+                    files_to_hash+=( "$recovery_name" )
                 fi
             done            
             
+            # Generate sha256sum
+            cd "$ZIP_DIR/$zipsubdir"
+            for f in "${files_to_hash[@]}"; do
+                sha256sum "$f" > "$ZIP_DIR/$zipsubdir/$f.sha256sum"
+            done
+          
             cd "$source_dir" || exit
             
-            # Successfull build
+            # Successful build
             build_successful=true
         else
             # Build failed
@@ -594,7 +597,8 @@ function build_lineageos() {
             print_log " >> $mess_log" "INFO"
             
             $CUSTOM_SCRIPT_POST_BUILD "$codename" $build_successful \
-                | print_log_catcher $LOG_BUILD
+                | print_log_catcher $LOG_BUILD \
+                || print_log "WARNING: $CUSTOM_SCRIPT_POST_BUILD failed !" "WARN"
         fi
         print_log " >> Finishing build for $codename" $LOG_BUILD
 
@@ -611,7 +615,8 @@ function build_lineageos() {
                 | awk '{ print $2 }' \
                 | sort -u \
                 | xargs -r kill \
-                &> /dev/null
+                &> /dev/null \
+                || true
 
             while lsof | grep -q "$TMP_DIR"/merged; do
                 sleep 1
@@ -626,7 +631,7 @@ function build_lineageos() {
                 $LOG_BUILD
             if [ "$BUILD_OVERLAY" = true ]; then
                 cd "$TMP_DIR" || exit
-                rm -rf ./*
+                rm -rf ./* || true
             else
                 cd "$source_dir" || exit
                 
@@ -726,7 +731,8 @@ function main() {
     #----------------------------
     if [ -f $CUSTOM_SCRIPT_BEGIN ]; then
         print_log "Running begin custom scripts: $CUSTOM_SCRIPT_BEGIN" "INFO"
-        $CUSTOM_SCRIPT_BEGIN
+        $CUSTOM_SCRIPT_BEGIN || print_log "WARNING: $CUSTOM_SCRIPT_BEGIN failed !" \
+                "WARN"
     fi
     
     # Init build
@@ -795,6 +801,7 @@ function main() {
                 --mirror \
                 --no-clone-bundle \
                 -p linux \
+                --git-lfs \
                 2>&1 \
                 | print_log_catcher $LOG_REPO "REPO" \
                 || EXIT_CODE=$?
@@ -953,12 +960,14 @@ function main() {
                     -u $GITHUB_ANDROID \
                     --reference "$MIRROR_DIR" \
                     -b "$branch" 2>&1 \
+                    --git-lfs \
                    | print_log_catcher $LOG_REPO "REPO" \
                    || EXIT_CODE=$?
             else   
                 (yes || true) | repo init \
                     -u $GITHUB_ANDROID \
                     -b "$branch" 2>&1 \
+                    --git-lfs \
                    | print_log_catcher $LOG_REPO "REPO" \
                    || EXIT_CODE=$?
             fi
@@ -1139,7 +1148,8 @@ function main() {
                 mess_log="Running before custom scripts:"
                 mess_log+="$CUSTOM_SCRIPT_BEFORE"
                 print_log " >> $mess_log" "INFO"
-                $CUSTOM_SCRIPT_BEFORE
+                $CUSTOM_SCRIPT_BEFORE || print_log "WARNING: $CUSTOM_SCRIPT_BEFORE failed !" \
+                "WARN"
             fi            
         
             # Build for every devices
@@ -1158,13 +1168,14 @@ function main() {
     # Clean old logs
     if [ "$DELETE_OLD_LOGS" -gt "0" ]; then
         find "$LOGS_DIR" -maxdepth 1 -name 'repo-*.log' \
-            | sort | head -n -"$DELETE_OLD_LOGS" | xargs -r rm
+            | sort | head -n -"$DELETE_OLD_LOGS" | xargs -r rm || true
     fi
 
     # Exec custom scripts after building
     if [ -f $CUSTOM_SCRIPT_AFTER ]; then
         print_log " >> Running end custom scripts: $CUSTOM_SCRIPT_AFTER" "INFO"
-        $CUSTOM_SCRIPT_AFTER
+        $CUSTOM_SCRIPT_AFTER || print_log "WARNING: $CUSTOM_SCRIPT_AFTER failed !" \
+                "WARN"
     fi
     
     # End
